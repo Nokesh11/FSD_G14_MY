@@ -1,38 +1,83 @@
-import React from 'react';
-import { Drawer, List, ListItem, ListItemIcon, ListItemText, Typography } from '@mui/material';
-import { Home, School, AccountCircle } from '@mui/icons-material';
+import {
+  ChevronFirst,
+  LogOut,
+  Home,
+  Calendar,
+  FileText,
+  Clock,
+  Book,
+  ChevronLast,
+} from "lucide-react";
+import SidebarItem from "./SidebarItem";
+import React, { createContext, useState } from "react";
 
-const menuItems = [
-    { text: 'Home', icon: <Home />, route: '/' },
-    { text: 'Courses', icon: <School />, route: '/courses' },
-    { text: 'Profile', icon: <AccountCircle />, route: '/profile' },
+const sidebarItems = [
+  { icon: <Home />, text: "Dashboard", active: true },
+  { icon: <Calendar />, text: "Attendance", active: false },
+  { icon: <FileText />, text: "DocVault", active: false, alert: true },
+  { icon: <Clock />, text: "TimeTable", active: false },
+  { icon: <Book />, text: "Almanac", active: false },
 ];
 
-function Sidebar() {
-    return (
-        <Drawer 
-            variant="permanent" 
-            anchor="left"
-            PaperProps={{ sx: { backgroundColor: '#1a1a1a', color: 'white', width: 250 } }}
-        >
-            <div className="sidebar-header" style={{ padding: '16px' }}>
-                <Typography variant="h6" component="div" sx={{ color: 'white', fontWeight: 'bold' }}>
-                    My Dashboard
-                </Typography>
+export const SidebarContext = createContext();
+function Sidebar({ children }) {
+  const [expanded, setExpanded] = useState(true);
+  return (
+    <aside className={`h-screen overflow-hidden transition-all ${expanded ? "w-56" : "w-16"}`}>
+      <nav className="h-full flex flex-col bg-white border-r shadow-sm">
+        <div className="p-4 pb-2 flex justify-between items-center border-b">
+          <img
+            src="https://img.logoipsum.com/243.svg"
+            className={`overflow-hidden transition-all ${
+              expanded ? "w-32" : "w-0"
+            }`}
+            alt=""
+          />
+          <button
+            className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100"
+            onClick={() => setExpanded((curr) => !curr)}
+          >
+            {expanded ? <ChevronFirst /> : <ChevronLast />}
+          </button>
+        </div>
+        <SidebarContext.Provider value={{ expanded }}>
+          <ul className="flex-1 px-3 my-1">
+            {sidebarItems.map((item, index) => (
+              <SidebarItem
+                key={index}
+                icon={item.icon}
+                text={item.text}
+                active={item.active}
+                alert={item.alert}
+              />
+            ))}
+          </ul>
+        </SidebarContext.Provider>
+        <div className="border-t flex p-3">
+          <img
+            src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250"
+            alt=""
+            className="w-10 h-10 rounded-full"
+          />
+          <div
+            className={`flex justify-between items-center overflow-hidden transition-all ${
+              expanded ? "w-52 ml-3" : "w-0"
+            }`}
+          >
+            <div className="leading-4">
+              <p className="font-semibold mb-0">John Doe</p>
+              <span className="text-xs mt-0 text-gray-600">
+                johnDoe@gmail.com
+              </span>
             </div>
-
-            <List>
-                {menuItems.map((item, index) => (
-                    <ListItem button key={index} sx={{ '&:hover': { backgroundColor: '#333333' } }}>
-                        <ListItemIcon sx={{ color: 'white' }}>
-                            {item.icon}
-                        </ListItemIcon>
-                        <ListItemText primary={item.text} />
-                    </ListItem>
-                ))}
-            </List>
-        </Drawer>
-    );
+            <button className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100">
+              <LogOut className="p-0.5" />
+            </button>
+          </div>
+        </div>
+      </nav>
+    </aside>
+  );
 }
 
 export default Sidebar;
