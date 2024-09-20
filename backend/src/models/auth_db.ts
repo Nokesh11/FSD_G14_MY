@@ -1,91 +1,59 @@
 import crypto from 'crypto';
 import { userType } from '../shared';
 import { TOKEN_CHAR_SET, TOKEN_LENGTH, SALT, SALTING_ROUNDS } from '../config';
-import { Db, Collection, ObjectId, Document } from 'mongodb';
+import { Db, Collection, ObjectId, Document, Admin } from 'mongodb';
+import { Central } from './central';
+import { debugEnum } from '../shared';
 
-export enum verifyCredsResult {INVALID_CREDENTIALS, VALID_CREDENTIALS, INVALID_USER_TYPE};
-export enum verifyTokenResult {INVALID_TOKEN, VALID_TOKEN, INVALID_USER_TYPE};
 export enum powerType {CREATE_USER, DELETE_USER, CHANGE_PASSWORD, GIVE_POWERS, GIVE_ATTENDANCE, VIEW_ATTENDANCE};
 
-interface getUserResult 
-{
-    col: Collection <Document>;
-    userDoc: Document | null;
-}
 export class AuthDB 
 {
-    static db : Db ;
-    static student_col : Collection;
-    static admin_col : Collection;
-
-    static init(db : Db) : void
-    {   
-        AuthDB.db = db;
-        AuthDB.student_col = db.collection('student');
-        AuthDB.admin_col = db.collection('admin');
-    }
-
-    // Reutrns null if the user type is invalid, else returns the collection
-    static async getCol(type: userType) : Promise<Collection | null> 
+ 
+    public static async verifyCreds (userID: string, password: string, type: userType, instID: string): Promise<debugEnum>
     {
-        switch (type)
+        const instDB = await Central.getInstDB(instID);
+
+        if (instDB === null)
         {
-            case userType.STUDENT:
-                return this.student_col;
-            case userType.ADMIN:
-                return this.admin_col;
-            default:
-                return null;
+            return debugEnum.INVALID_INST_ID;
         }
-    }
 
-    static async getUser (userID: string, type: userType): Promise< getUserResult | null>
-    {
-        const col = await this.getCol(type);
-        if (col === null)
-        {
-            return null;
-        }
-        return {col : col , userDoc : await col.findOne({_id : new ObjectId(userID)})};
-    }
-
-    static async verifyCreds (userID: string, password: string, type: userType ): Promise<verifyCredsResult>
-    {
-        const col = await this.getCol(type);
+        const col = Central.getCol(type, instDB);
     
         if (col === null)
         {
-            return verifyCredsResult.INVALID_USER_TYPE;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const passHash = this.hash(password);
-        const userDoc = await col.findOne({_id : new ObjectId(userID), passHash : passHash}); 
+        const passHash = AuthDB.hash(password);
+        const user = await col.findOne({_id : new ObjectId(userID), passHash : passHash}); 
 
-        if (userDoc === null)
+        if (user === null)
         {
-            return verifyCredsResult.INVALID_CREDENTIALS;
+            return debugEnum.INVALID_CREDENTIALS;
         }
 
-        return verifyCredsResult.VALID_CREDENTIALS;
+        return debugEnum.SUCCESS;
     };
 
-    static async verifyToken ( userID: string, token: string, type: userType ): Promise<verifyTokenResult>
+    public static async verifyToken ( userID: string, token: string, type: userType, instID : string ): Promise<debugEnum>
     {
-        const col = await this.getCol(type);
-        if (col === null)
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
         {
-            return verifyTokenResult.INVALID_USER_TYPE;
+            return debugEnum.INVALID_INST_ID;
         }
+        const tokenHash = AuthDB.hash(token);
+        const tokenDoc = await instDB.token_col.findOne({_id: new ObjectId (tokenHash), 'userID': userID});
 
-        const tokenDoc = await col.findOne({_id: new ObjectId (token), 'userID': userID});
-
-        if (tokenDoc === null)
+        if (token === null)
         {
-            return verifyTokenResult.INVALID_TOKEN;
+            return debugEnum.INVALID_TOKEN;
         }
-        return verifyTokenResult.VALID_TOKEN;
+        return debugEnum.SUCCESS;
     };
 
-    static genToken(): string
+    private static genToken(): string
     {
         let token = "";
         for (let i = 0 ; i < TOKEN_LENGTH ; i++)
@@ -93,137 +61,172 @@ export class AuthDB
         return token;
     }
 
-    // Returns null if usertype does not exist, else sets token and returns token
-    // Note : This function does not validate if a user id exists. It only sets the token.
-    static async setToken (userID: string, type: userType): Promise<string | null>
+    // Returns null if usertype or the user does not exist, else sets token and returns token
+    public static async setToken (userID : string, type : userType, instID : string): Promise<string | null>
     {
-        const col = await this.getCol(type);
-        if (col === null)
+        const instDB = await Central.getInstDB(instID)
+        if (instDB === null)
+        {
+            return null;
+        }
+        const col = Central.getCol(type, instDB);
+        if ( col === null)
+        {
+            return null;
+        }
+        const user = await Central.getUser(userID, col);
+        if (user === null)
         {
             return null;
         }
         while ( true )
         {
-            const token = this.genToken();
-            const token_doc = await col.findOne({_id : new ObjectId(token)});
+            const token_hash = AuthDB.hash(AuthDB.genToken());
+            const token_doc = await instDB.token_col.findOne({_id : new ObjectId(token_hash)});
             if (token_doc === null)
             {
-                await col.insertOne({_id : new ObjectId(token), userID : userID});
-                return token;
+                await instDB.token_col.insertOne({_id : new ObjectId(token_hash), userID : userID});
+                return token_hash;
             }
         }
     }
 
-    static hash(input: string) : string 
+    private static hash(input: string) : string 
     {        
         return crypto.pbkdf2Sync(input, SALT, SALTING_ROUNDS, 64, 'sha512').toString('hex');
     }
 
     // Returns false if usertype or user does not exist, else returns true
-    static async changePassword (userID: string, password: string, type: userType): Promise<boolean>
+    static async changePassword (userID: string, password: string, type: userType, instID: string): Promise<debugEnum>
     {
-        const col = await this.getCol(type);
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return debugEnum.INVALID_INST_ID;
+        }
+        const col = Central.getCol(type, instDB);
         if (col === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const passHash = this.hash(password);
+        const user = Central.getUser(userID, col)
+        if (user === null)
+        {
+            return debugEnum.INVALID_USER_ID;
+        }
+        const passHash = AuthDB.hash(password);
         const res = await col.updateOne({_id : new ObjectId(userID)}, {$set : {passHash : passHash}});
         if (res.modifiedCount === 0)
         {
-            return false;
+            return debugEnum.INVALID_USER_ID;
         }
-        return true;
+        return debugEnum.SUCCESS;
     }
 
     // Returns false if usertype does not exist or user already exists, else returns true
-    static async createUser (userID: string, password: string, type: userType): Promise<boolean>
+    static async createUser (userID: string, password: string, type: userType, instID : string): Promise<debugEnum>
     {
-        const col = await this.getCol(type);
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return debugEnum.INVALID_INST_ID;
+        }
+        const col = Central.getCol(type, instDB);
         if (col === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const passHash = this.hash(password);
-        const userDoc = await col.findOne({_id : new ObjectId(userID)});
-        if (userDoc === null)
+        const user = Central.getUser(userID, col)
+        if (user !== null)
         {
-            return false;
+            return debugEnum.USER_ALREADY_EXISTS;
         }
+        const passHash = AuthDB.hash(password);
         await col.insertOne({_id : new ObjectId(userID), passHash : passHash});
-        return true;
+        return debugEnum.SUCCESS;
     }
 
     // Returns false if usertype does not exist or user does not exist, else returns true
-    static async deleteUser (userID: string, type: userType): Promise<boolean>
-    {
-        const col = await this.getCol(type);
+    static async deleteUser (userID: string, type : userType, instID : string): Promise<debugEnum>
+    {        
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return debugEnum.INVALID_INST_ID;
+        }
+        const col = Central.getCol(type, instDB);
         if (col === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const res = await col.deleteOne({_id : new ObjectId(userID)});
+        const user = Central.getUser(userID, col)
+        if (user === null)
+        {
+            return debugEnum.INVALID_USER_ID;
+        }
+        await col.deleteOne({_id : new ObjectId(userID)});
+        return debugEnum.SUCCESS;
+    }
+
+    static async deleteToken (token: string, instDB: Central): Promise<debugEnum>
+    {
+        const res = await instDB.ticket_col.deleteOne({_id : new ObjectId(token)});
         if (res.deletedCount === 0)
         {
-            return false;
+            return debugEnum.INVALID_TOKEN;
         }
-        return true;
+        return debugEnum.SUCCESS;
     }
 
-    static async deleteToken (token: string, type: userType): Promise<boolean>
+    static async givePowers (userID: string, type : userType, instID : string, power: powerType): Promise<debugEnum>
     {
-        const col = await this.getCol(type);
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return debugEnum.INVALID_INST_ID;
+        }
+        const col = Central.getCol(type, instDB);
         if (col === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const res = await col.deleteOne({_id : new ObjectId(token)});
-        if (res.deletedCount === 0)
+        const user = Central.getUser(userID, col)
+        if (user === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_ID;
         }
-        return true;
+        let powers = user.powers;
+        powers.push(power);
+        await col.updateOne({_id : new ObjectId(userID)}, {$set : {power : powers}});
+        return debugEnum.SUCCESS;
     }
 
-    static async givePowers (userID: string, type: userType, power: powerType ): Promise<boolean>
+    static async removePowers (userID: string, type: userType, power: powerType, instID: string ): Promise<debugEnum>
     {
-        const col = await this.getCol(type);
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return debugEnum.INVALID_INST_ID;
+        }
+        const col = Central.getCol(type, instDB);
         if (col === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_TYPE;
         }
-        const userDoc = await col.findOne({_id : new ObjectId(userID)});
-        if (userDoc === null)
+        const user = Central.getUser(userID, col)
+        if (user === null)
         {
-            return false;
+            return debugEnum.INVALID_USER_ID;
         }
-        let power_attr = userDoc.power;
-        power_attr.push(power);
-        await col.updateOne({_id : new ObjectId(userID)}, {$set : {power : power_attr}});
-        return true;
-    }
 
-    static async removePowers (userID: string, type: userType, power: powerType ): Promise<boolean>
-    {
-        const col = await this.getCol(type);
-        if (col === null)
-        {
-            return false;
-        }
-        const userDoc = await col.findOne({_id : new ObjectId(userID)});
-        if (userDoc === null)
-        {
-            return false;
-        }
-        let power_attr = userDoc.power;
-        const index = power_attr.indexOf(power);
+        let powers = user.power;
+        const index = powers.indexOf(power);
         if (index === -1)
         {
-            return false;
+            return debugEnum.POWER_DOES_NOT_EXIST;
         }
-        power_attr.splice(index, 1);
-        await col.updateOne({_id : new ObjectId(userID)}, {$set : {power : power_attr}});
-        return true;
+        powers.splice(index, 1);
+        await col.updateOne({_id : new ObjectId(userID)}, {$set : {power : powers}});
+        return debugEnum.SUCCESS;
     }
-
 }
