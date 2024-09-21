@@ -1,64 +1,67 @@
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Cell, Label } from 'recharts';
 
-// Mock data for the chart
-const total = 30;
-const unattended = 5;
-const data = [
-    { name: 'Attended', value: total - unattended },
-    { name: 'Unattended', value: unattended },
+// Mock data for different subjects
+const subjects = [
+    { name: 'Math', attended: 25, unattended: 5 },
+    { name: 'Physics', attended: 22, unattended: 8 },
+    { name: 'Chemistry', attended: 27, unattended: 3 },
+    { name: 'Biology', attended: 28, unattended: 2 },
+    { name: 'English', attended: 20, unattended: 10 },
+    { name: 'History', attended: 18, unattended: 12 },
 ];
-const COLORS = ['#0088FE', '#00C49F'];
+
+// Colors for attended portion (unattended will be white)
+const COLORS = [
+    ['#0088FE', '#FFFFFF'], // Math
+    ['#FFBB28', '#FFFFFF'], // Physics
+    ['#FF6384', '#FFFFFF'], // Chemistry
+    ['#4BC0C0', '#FFFFFF'], // Biology
+    ['#9966FF', '#FFFFFF'], // English
+    ['#66FF66', '#FFFFFF'], // History
+];
 
 export default class AttendanceChart extends PureComponent {
+    renderPieChart = (subject, index) => (
+        <div key={index} style={styles.chartContainer}>
+            <PieChart width={200} height={200}>
+                <Pie
+                    data={[
+                        { name: 'Attended', value: subject.attended },
+                        { name: 'Unattended', value: subject.unattended },
+                    ]}
+                    cx={100}
+                    cy={100}
+                    innerRadius={60}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    paddingAngle={5}
+                    dataKey="value"
+                >
+                    {[
+                        { name: 'Attended', value: subject.attended },
+                        { name: 'Unattended', value: subject.unattended },
+                    ].map((entry, idx) => (
+                        <Cell key={`cell-${idx}`} fill={COLORS[index][idx % COLORS[index].length]} />
+                    ))}
+                    <Label
+                        value={`Attended: ${subject.attended}`}
+                        position="center"
+                        style={{ fontSize: '14px', fill: '#000' }}
+                    />
+                </Pie>
+            </PieChart>
+            <p style={styles.subjectLabel}>{subject.name}</p> {/* Subject label */}
+        </div>
+    );
+
     render() {
         return (
             <div style={styles.card}>
                 <h3 style={styles.cardTitle}>Attendance Summary</h3>
-                <PieChart width={800} height={400}>
-                    <Pie
-                        data={data}
-                        cx={120}
-                        cy={200}
-                        innerRadius={60}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                        dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                        {/* Display label inside the pie */}
-                        <Label
-                            value={`Attended: ${total - unattended}`}
-                            position="center"
-                            style={{ fontSize: '14px', fill: '#000' }}
-                        />
-                    </Pie>
-                    <Pie
-                        data={data}
-                        cx={420}
-                        cy={200}
-                        startAngle={180}
-                        endAngle={0}
-                        innerRadius={60}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        paddingAngle={5}
-                        dataKey="value"
-                    >
-                        {data.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                        {/* Display label inside the pie */}
-                        <Label
-                            value={`Attended: ${total - unattended}`}
-                            position="center"
-                            style={{ fontSize: '14px', fill: '#000' }}
-                        />
-                    </Pie>
-                </PieChart>
+                <div style={styles.chartWrapper}>
+                    {subjects.map((subject, index) => this.renderPieChart(subject, index))}
+                </div>
             </div>
         );
     }
@@ -67,120 +70,34 @@ export default class AttendanceChart extends PureComponent {
 // Simple card styles
 const styles = {
     card: {
-        width: '40%',
-        margin: '4rem auto',
-        padding: '1rem',
+        width: '51.5%',
+        margin: '0.1rem',
+        padding: '0.1rem',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         borderRadius: '8px',
-        backgroundImage: { 'light-gradient': 'linear-gradient(to bottom, #ffffff, #f0f0f0)' },
-        textAlign: 'center',
+        backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)',
+        overflowX: 'auto', // Add horizontal scroll
     },
     cardTitle: {
         marginBottom: '20px',
         fontSize: '1.5em',
         color: '#333',
+        textAlign: 'center',
     },
-    // };
-    // import GaugeComponent from 'react-gauge-component';
-
-
-    // // class AttendanceChart extends PureComponent {
-    // //     render() {
-    // //         return (
-    // //             <GaugeComponent
-    // //                 type="radial"  // Use the appropriate type from your documentation, e.g., "radial"
-    // //                 value={75}
-    // //                 minValue={0}
-    // //                 maxValue={100}
-    // //                 startAngle={-180}
-    // //                 endAngle={180}
-    // //                 arc={{
-    // //                     cornerRadius: 7,
-    // //                     padding: 0.05,
-    // //                     width: 0.2, // Adjust the width of the arc
-    // //                     colorArray: ["#5BE12C", "#F5CD19", "#EA4228"], // Customize the colors
-    // //                     subArcs: [
-    // //                         { limit: 33, color: "#5BE12C" },
-    // //                         { limit: 66, color: "#F5CD19" },
-    // //                         { color: "#EA4228" }
-    // //                     ],
-    // //                     animate: true,  // Enabling arc animation
-    // //                 }}
-    // //                 pointer={{
-    // //                     hide: true, // Hides the needle
-    // //                 }}
-    // //                 labels={{
-    // //                     valueLabel: {
-    // //                         formatTextValue: value => `${value} / 100`,
-    // //                         style: { fontSize: '35px', fill: '#fff', textShadow: 'black 1px 1px 0px' },
-    // //                     },
-    // //                 }}
-    // //                 style={{ width: 300, height: 300 }}  // Adjust the size of the gauge as needed
-    // //                 animationDuration={3000}  // Duration for the sub-arcs animation
-    // //                 animationDelay={100}      // Delay for starting the animation
-    // //             />
-    // //         );
-    // //     };
-    // // }
-
-    // // export default AttendanceChart;
-    // // import React from 'react';
-    // // import { Doughnut } from 'react-chartjs-2';
-
-    // // const data = {
-    // //     datasets: [
-    // //         {
-    // //             data: [70, 30], // 70% progress
-    // //             backgroundColor: ['#4caf50', '#e0e0e0'],
-    // //         },
-    // //     ],
-    // // };
-
-    // // const options = {
-    // //     cutout: '80%', // Hollow center like LeetCode profile meters
-    // //     rotation: -90,
-    // //     circumference: 180, // Semi-circle
-    // // };
-
-    // // function AttendanceChart() {
-    // //     return <Doughnut data={data} options={options} />;
-    // // }
-
-    // // export default AttendanceChart;
-
-
-    // const AttendanceChart = () => {
-    //     return (
-    //         <GaugeComponent
-    //             type="radial"  // Radial to mimic LeetCode’s circular gauge
-    //             value={75}     // The value to be displayed, e.g., progress
-    //             minValue={0}
-    //             maxValue={100}
-    //             startAngle={0}   // Start angle for LeetCode style
-    //             endAngle={180}      // End angle for LeetCode style
-    //             arc={{
-    //                 cornerRadius: 10,  // Rounded corners for smoother look
-    //                 padding: 0.02,     // Small padding between the arcs
-    //                 width: 0.2,        // Adjust arc width
-    //                 gradient: true,    // Use gradient to fill smoothly
-    //                 colorArray: ["#00C49F", "#FFBB28", "#FF8042"], // Similar to LeetCode's green-to-orange progression
-    //                 animate: true,     // Enable smooth animation
-    //             }}
-    //             pointer={{
-    //                 hide: true, // Hides the pointer
-    //             }}
-    //             labels={{
-    //                 valueLabel: {
-    //                     formatTextValue: value => `${value}%`, // Percentage label
-    //                     style: { fontSize: '30px', fill: '#333', fontWeight: 'bold' },  // Center label style
-    //                     matchColorWithArc: true,  // Match the label color with the arc
-    //                 },
-    //             }}
-    //             style={{ width: 300, height: 300 }}  // Size similar to LeetCode progress ring
-    //             animationDuration={2000}  // Smooth animation duration
-    //             animationDelay={100}      // Slight delay before animation starts
-    //         />
-    //     );
-    // };
-    // export default AttendanceChart;
-}
+    chartWrapper: {
+        display: 'flex',
+        flexDirection: 'row',
+        overflowX: 'scroll', // Enable horizontal scroll
+        padding: '1rem',
+    },
+    chartContainer: {
+        flex: '0 0 auto', // Prevent charts from shrinking
+        margin: '0 1rem', // Add space between charts
+        textAlign: 'center',
+    },
+    subjectLabel: {
+        marginTop: '10px',
+        fontSize: '1.1em',
+        color: '#333',
+    },
+};

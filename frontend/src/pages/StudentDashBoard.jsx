@@ -8,14 +8,12 @@ function StudentDashboard() {
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={2}>
-        {/* Sidebar takes 2 out of 12 grid spaces */}
         <Grid item xs={12} md={2}>
           <Sidebar />
         </Grid>
 
-        {/* Main content takes the remaining 10 out of 12 grid spaces */}
         <Grid item xs={12} md={10}>
-          <Box>
+          <Box spacing={5}>
             <AttendanceChart />
             <TicketTable />
           </Box>
