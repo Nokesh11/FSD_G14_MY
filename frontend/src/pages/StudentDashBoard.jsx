@@ -1,8 +1,10 @@
 import { Box, Grid, Typography } from "@mui/material";
 import React, { createContext, useState } from "react";
 import Appbar from "../components/Appbar";
-import Sidebar from "../components/Sidebar";
 import Calender from "../components/Calender";
+import Sidebar from "../components/Sidebar";
+import AttendanceChart from "../components/AttendanceChart";
+import TicketTable from "../components/TicketTable";
 
 export const sidebarContext = createContext();
 
@@ -10,10 +12,10 @@ function StudentDashboard() {
   const [expanded, setExpanded] = useState(true);
 
   return (
-    <Box>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <sidebarContext.Provider value={{ expanded, setExpanded }}>
         <Appbar />
-        <div className="flex w-full" style={{ height: "calc(100vh - 64px)" }}>
+        <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
           <Sidebar />
           <Box
             sx={{
@@ -22,9 +24,11 @@ function StudentDashboard() {
               transition: "margin-left 0.3s ease",
               height: "100%",
               padding: 2,
+              display: "flex",
+              flexDirection: "column",
             }}
           >
-            <Grid container spacing={4} sx={{ height: "100%" }}>
+            <Grid container spacing={4} sx={{ flexGrow: 1 }}>
               {/* Left Grid Item */}
               <Grid item xs={12} sm={6}>
                 <Box
@@ -38,7 +42,7 @@ function StudentDashboard() {
                   p={2}
                   sx={{ boxShadow: 3 }}
                 >
-                  Item 1
+                  <AttendanceChart />
                 </Box>
               </Grid>
 
@@ -60,7 +64,7 @@ function StudentDashboard() {
                       flex: 1,
                       display: "flex",
                       flexDirection: "column",
-                      width: "70%", // Reduced width for the schedule
+                      width: "70%",
                     }}
                   >
                     {/* Fixed Heading */}
@@ -80,7 +84,7 @@ function StudentDashboard() {
                       sx={{
                         flexGrow: 1,
                         overflowY: "auto",
-                        px: 2, // Removed vertical padding
+                        px: 2,
                       }}
                     >
                       {[
@@ -113,12 +117,12 @@ function StudentDashboard() {
                   {/* Calendar Section */}
                   <Box
                     sx={{
-                      width: "300px", // Fixed width for the calendar
+                      width: "300px",
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                       borderLeft: "1px solid #ccc",
-                      bgcolor: "white", // Background color for the calendar
+                      bgcolor: "white",
                     }}
                   >
                     <Calender />
@@ -130,7 +134,7 @@ function StudentDashboard() {
               <Grid item xs={12} sm={6}>
                 <Box
                   width="100%"
-                  height="100%"
+                  height="350px"
                   bgcolor="gray"
                   color="white"
                   display="flex"
@@ -142,10 +146,11 @@ function StudentDashboard() {
                   Item 2
                 </Box>
               </Grid>
+
               <Grid item xs={12} sm={6}>
                 <Box
                   width="100%"
-                  height="100%"
+                  height="350px"
                   bgcolor="blue"
                   color="white"
                   display="flex"
@@ -154,12 +159,12 @@ function StudentDashboard() {
                   p={2}
                   sx={{ boxShadow: 3 }}
                 >
-                  Item 3
+                  <TicketTable />
                 </Box>
               </Grid>
             </Grid>
           </Box>
-        </div>
+        </Box>
       </sidebarContext.Provider>
     </Box>
   );
