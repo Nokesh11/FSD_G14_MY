@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
-import { SidebarContext } from "./Sidebar";
+import { sidebarContext } from "../pages/StudentDashBoard";
 
 function SidebarItem({ icon, text, active, alert }) {
-  const { expanded } = useContext(SidebarContext);
+  const { expanded } = useContext(sidebarContext);
   return (
     <li
       className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors ${
