@@ -58,7 +58,6 @@ export default class AttendanceChart extends PureComponent {
     render() {
         return (
             <div style={styles.card}>
-                <h3 style={styles.cardTitle}>Attendance Summary</h3>
                 <div style={styles.chartWrapper}>
                     {subjects.map((subject, index) => this.renderPieChart(subject, index))}
                 </div>
