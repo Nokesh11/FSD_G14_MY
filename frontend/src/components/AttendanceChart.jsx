@@ -13,12 +13,12 @@ const subjects = [
 
 // Colors for attended portion (unattended will be white)
 const COLORS = [
-    ['#0088FE', '#FFFFFF'], // Math
-    ['#FFBB28', '#FFFFFF'], // Physics
-    ['#FF6384', '#FFFFFF'], // Chemistry
-    ['#4BC0C0', '#FFFFFF'], // Biology
-    ['#9966FF', '#FFFFFF'], // English
-    ['#66FF66', '#FFFFFF'], // History
+    ['#0088FE', '#f7f7f7'], // Math
+    ['#FFBB28', '#f7f7f7'], // Physics
+    ['#FF6384', '#f7f7f7'], // Chemistry
+    ['#4BC0C0', '#f7f7f7'], // Biology
+    ['#9966FF', '#f7f7f7'], // English
+    ['#66FF66', '#f7f7f7'], // History
 ];
 
 export default class AttendanceChart extends PureComponent {
@@ -70,9 +70,10 @@ export default class AttendanceChart extends PureComponent {
 // Simple card styles
 const styles = {
     card: {
-        width: '51.5%',
-        margin: '0.1rem',
-        padding: '0.1rem',
+        width: '100%',
+        height: '100%',
+        // margin: '0.1rem',
+        // padding: '0.1rem',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         borderRadius: '8px',
         backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)',
@@ -88,15 +89,15 @@ const styles = {
         display: 'flex',
         flexDirection: 'row',
         overflowX: 'scroll', // Enable horizontal scroll
-        padding: '1rem',
+        paddingBottom: '1rem',
     },
     chartContainer: {
         flex: '0 0 auto', // Prevent charts from shrinking
-        margin: '0 1rem', // Add space between charts
+        // margin: '0 1rem', // Add space between charts
         textAlign: 'center',
     },
     subjectLabel: {
-        marginTop: '10px',
+        margin: '10px',
         fontSize: '1.1em',
         color: '#333',
     },

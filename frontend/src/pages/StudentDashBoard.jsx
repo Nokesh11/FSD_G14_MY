@@ -26,6 +26,7 @@ function StudentDashboard() {
               padding: 2,
               display: "flex",
               flexDirection: "column",
+              overflow: "auto", // Handle overflow better
             }}
           >
             <Grid container spacing={4} sx={{ flexGrow: 1 }}>
@@ -34,13 +35,9 @@ function StudentDashboard() {
                 <Box
                   width="100%"
                   height="350px"
-                  bgcolor="black"
-                  color="white"
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
-                  p={2}
-                  sx={{ boxShadow: 3 }}
                 >
                   <AttendanceChart />
                 </Box>
@@ -64,7 +61,6 @@ function StudentDashboard() {
                       flex: 1,
                       display: "flex",
                       flexDirection: "column",
-                      width: "70%",
                     }}
                   >
                     {/* Fixed Heading */}
@@ -150,14 +146,12 @@ function StudentDashboard() {
               <Grid item xs={12} sm={6}>
                 <Box
                   width="100%"
-                  height="350px"
-                  bgcolor="blue"
-                  color="white"
-                  display="flex"
+                  height="87%"
+                  display="-ms-flexbox"
                   justifyContent="center"
                   alignItems="center"
-                  p={2}
-                  sx={{ boxShadow: 3 }}
+                // p={2}
+                // sx={{ boxShadow: 3 }}
                 >
                   <TicketTable />
                 </Box>

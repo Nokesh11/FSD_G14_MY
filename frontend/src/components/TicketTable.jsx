@@ -34,6 +34,7 @@ const completedRows = [
     createTicketData(3, 'Closed', 'Bug in payment gateway', 'Alice Johnson'),
     createTicketData(5, 'Resolved', 'UI glitch on homepage', 'Charlie Brown'),
     createTicketData(8, 'Resolved', 'Performance optimization', 'Daniel James'),
+    createTicketData(9, 'Resolved', 'Code optimization', 'Charlie James'),
 ];
 
 // Main component with tabs and new ticket functionality
@@ -69,50 +70,54 @@ export default function TicketTableWithTabs() {
 
     // Table rendering function
     const renderTable = (rows) => (
-        <TableContainer component={Paper} sx={{ maxWidth: "100%", overflowY: 'auto', overflowX: 'auto' }}>
-            <Table stickyHeader sx={{ minWidth: 650 }} aria-label="ticket table">
-                <TableHead>
-                    <TableRow>
-                        <TableCell>Serial Number</TableCell>
-                        <TableCell align="right">Status</TableCell>
-                        <TableCell align="right">Description</TableCell>
-                        <TableCell align="right">Recipient</TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {rows.map((ticket) => (
-                        <TableRow
-                            key={ticket.serial}
-                            sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                            <TableCell component="th" scope="row">
-                                {ticket.serial}
-                            </TableCell>
-                            <TableCell align="right">{ticket.status}</TableCell>
-                            <TableCell align="right">{ticket.description}</TableCell>
-                            <TableCell align="right">{ticket.recipient}</TableCell>
+        <React.Fragment>
+            <TableContainer
+                component={Paper}
+                sx={{
+                    maxHeight: 400, // Set max height for scrollable table
+                    overflowY: 'auto', // Enable vertical scrolling
+                }}
+            >
+                <Table stickyHeader sx={{ minWidth: "50%" }} aria-label="ticket table">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Serial Number</TableCell>
+                            <TableCell>Status</TableCell>
+                            <TableCell>Description</TableCell>
+                            <TableCell>Recipient</TableCell>
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                        {rows.map((ticket) => (
+                            <TableRow
+                                key={ticket.serial}
+                                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                            >
+                                <TableCell component="th" scope="row">
+                                    {ticket.serial}
+                                </TableCell>
+                                <TableCell>{ticket.status}</TableCell>
+                                <TableCell>{ticket.description}</TableCell>
+                                <TableCell>{ticket.recipient}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </React.Fragment>
     );
 
     return (
         <div style={styles.card}>
-            <Box sx={{ width: '100%' }}>
-                <Tabs value={tabIndex} onChange={handleTabChange} aria-label="ticket tabs">
-                    <Tab label="Pending Tickets" />
-                    <Tab label="Completed Tickets" />
-                </Tabs>
-
-                {/* Render table based on selected tab */}
-                {tabIndex === 0 && renderTable(pendingRows)}
-                {tabIndex === 1 && renderTable(completedRows)}
-
+            <Box sx={{ width: '100%', height: '100%', position: 'relative' }}>
                 {/* New Ticket Button */}
-                {tabIndex === 0 && (
-                    <Button variant="contained" color="primary" onClick={handleOpenDialog} style={styles.newTicketButton}>
+                {(
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        onClick={handleOpenDialog}
+                        style={styles.newTicketButton}
+                    >
                         Add New Ticket
                     </Button>
                 )}
@@ -142,10 +147,25 @@ export default function TicketTableWithTabs() {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseDialog} color="secondary">Cancel</Button>
-                        <Button onClick={handleSubmit} color="primary">Submit</Button>
+                        <Button onClick={handleCloseDialog} color="secondary">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleSubmit} color="primary">
+                            Submit
+                        </Button>
                     </DialogActions>
                 </Dialog>
+
+                <Tabs value={tabIndex} onChange={handleTabChange} aria-label="ticket tabs">
+                    <Tab label="Pending Tickets" />
+                    <Tab label="Completed Tickets" />
+                </Tabs>
+
+                {/* Render table based on selected tab */}
+                <Box sx={{ height: '85%', position: 'relative', overflow: 'hidden' }}>
+                    {tabIndex === 0 && renderTable(pendingRows)}
+                    {tabIndex === 1 && renderTable(completedRows)}
+                </Box>
             </Box>
         </div>
     );
@@ -154,16 +174,17 @@ export default function TicketTableWithTabs() {
 // Simple card styles
 const styles = {
     card: {
-        width: '51.5%',
+        width: '100%',
+        height: '100%', // Full height of the viewport
         margin: '0.1rem',
         padding: '1rem',
         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
         borderRadius: '8px',
         backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)',
-        overflowX: 'auto', // Add horizontal scroll
     },
     newTicketButton: {
-        marginTop: '20px',
-        float: 'right',
+        position: 'absolute',
+        top: '10px',
+        right: '10px',
     },
 };
