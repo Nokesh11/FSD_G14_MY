@@ -15,12 +15,12 @@ function StudentDashboard() {
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <sidebarContext.Provider value={{ expanded, setExpanded }}>
         <Appbar />
-        <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
+        <Box sx={{ display: "flex", flex: 1, height: "88vh" }}>
           <Sidebar />
           <Box
             sx={{
               flexGrow: 1,
-              marginLeft: expanded ? "0px" : "64px",
+              marginLeft: expanded ? "0px" : "1%",
               transition: "margin-left 0.3s ease",
               height: "100%",
               padding: 2,
