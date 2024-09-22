@@ -5,6 +5,7 @@ import Calender from "../components/Calender";
 import Sidebar from "../components/Sidebar";
 import AttendanceChart from "../components/AttendanceChart";
 import TicketTable from "../components/TicketTable";
+import AnnouncementsTable from "../components/Announcements";
 
 export const sidebarContext = createContext();
 
@@ -20,7 +21,6 @@ function StudentDashboard() {
           <Box
             sx={{
               flexGrow: 1,
-              marginLeft: expanded ? "0px" : "64px",
               transition: "margin-left 0.3s ease",
               height: "100%",
               padding: 3,
@@ -34,10 +34,10 @@ function StudentDashboard() {
                 <Card sx={{ boxShadow: 3 }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
-                      Attendance Rate
+                      CGPA
                     </Typography>
                     <Typography variant="h4" color="primary">
-                      95%
+                      9.25
                     </Typography>
                   </CardContent>
                 </Card>
@@ -105,29 +105,39 @@ function StudentDashboard() {
                             borderRadius: 1,
                           }}
                         >
-                          {["Math Class", "Science Project", "Lunch Meeting", "Gym Session"].map(
-                            (item, index) => (
-                              <Box
-                                key={index}
-                                sx={{
-                                  mb: 1,
-                                  p: 1,
-                                  border: "1px solid #ccc",
-                                  borderRadius: 1,
-                                  display: "flex",
-                                  justifyContent: "space-between",
-                                }}
-                              >
-                                <Typography variant="body2">{item}</Typography>
-                                <Typography variant="caption">
-                                  {index + 9}:00 AM
-                                </Typography>
-                              </Box>
-                            )
-                          )}
+                          {[
+                            "Math Class",
+                            "Science Project",
+                            "Lunch Meeting",
+                            "Gym Session",
+                          ].map((item, index) => (
+                            <Box
+                              key={index}
+                              sx={{
+                                mb: 1,
+                                p: 1,
+                                border: "1px solid #ccc",
+                                borderRadius: 1,
+                                display: "flex",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Typography variant="body2">{item}</Typography>
+                              <Typography variant="caption">
+                                {index + 9}:00 AM
+                              </Typography>
+                            </Box>
+                          ))}
                         </Box>
                       </Box>
-                      <Box sx={{ width: "40%", borderLeft: "1px solid #ccc", pl: 2 }}>
+                      <Box
+                        sx={{
+                          width: "40%",
+                          minWidth: "300px", // Set a minimum width for the calendar
+                          borderLeft: "1px solid #ccc",
+                          pl: 2,
+                        }}
+                      >
                         <Calender />
                       </Box>
                     </Box>
@@ -135,36 +145,20 @@ function StudentDashboard() {
                 </Card>
               </Grid>
 
-              {/* Additional Info - Tickets and More */}
-              <Grid item xs={12} sm={6}>
-                <Card sx={{ height: "100%", boxShadow: 3 }}>
-                  <CardContent>
-                    <Typography variant="h6" gutterBottom>
-                      Open Tickets
-                    </Typography>
-                    <Box height="250px">
-                      <TicketTable />
-                    </Box>
+              {/* Tickets Table */}
+              <Grid item xs={12} sm={8}>
+                <Card sx={{ boxShadow: 3 }}>
+                  <CardContent sx={{ display: "flex", flexDirection: "column" }}>
+                    <TicketTable />
                   </CardContent>
                 </Card>
               </Grid>
 
-              {/* Placeholder for Additional Content */}
-              <Grid item xs={12} sm={6}>
-                <Card sx={{ height: "100%", boxShadow: 3, bgcolor: "gray" }}>
-                  <CardContent>
-                    <Typography variant="h6" color="white" gutterBottom>
-                      Extra Info
-                    </Typography>
-                    <Box
-                      height="250px"
-                      display="flex"
-                      justifyContent="center"
-                      alignItems="center"
-                      color="white"
-                    >
-                      Custom Content
-                    </Box>
+              {/* Announcements Table */}
+              <Grid item xs={12} sm={4}>
+                <Card sx={{ boxShadow: 3 }}>
+                  <CardContent sx={{ display: "flex", flexDirection: "column" }}>
+                    <AnnouncementsTable />
                   </CardContent>
                 </Card>
               </Grid>

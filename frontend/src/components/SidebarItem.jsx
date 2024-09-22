@@ -3,6 +3,7 @@ import { sidebarContext } from "../pages/StudentDashBoard";
 
 function SidebarItem({ icon, text, active, alert }) {
   const { expanded } = useContext(sidebarContext);
+  
   return (
     <li
       className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors ${
@@ -11,11 +12,11 @@ function SidebarItem({ icon, text, active, alert }) {
           : "hover:bg-indigo-50 text-gray-600"
       }`}
     >
-      {icon}
+      <span className={`flex-shrink-0 ${expanded ? "text-lg" : "text-sm"}`}>
+        {icon}
+      </span>
       <span
-        className={`overflow-hidden transition-all ${
-          expanded ? "w-52 ml-3" : "w-0"
-        }`}
+        className={`overflow-hidden transition-all ${expanded ? "w-52 ml-3" : "w-0"}`}
       >
         {text}
       </span>

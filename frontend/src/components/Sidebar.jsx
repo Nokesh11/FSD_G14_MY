@@ -7,7 +7,7 @@ function Sidebar() {
   const { expanded } = useContext(sidebarContext);
   return (
     <aside
-      className={`h-full overflow-hidden top-2 transition-all duration-300 ${expanded ? "width : 100%" : "w-21"
+      className={`h-full overflow-hidden top-2 transition-all duration-300 ${expanded ? "width: 64px" : "width: 16px"
         }`}
     >
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
