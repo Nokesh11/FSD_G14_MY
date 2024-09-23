@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { ChevronFirst, AlignLeft, Settings } from "lucide-react";
 import { sidebarContext } from "../pages/StudentDashBoard";
 
 
 export default function AppBar() {
-  const {expanded, setExpanded} = useContext(sidebarContext);
-  const [isMobile, setIsMobile] = useState(false);
+  const {expanded, setExpanded, setIsMobile} = useContext(sidebarContext);
 
   useEffect(() => {
     const handleResize = () => {
@@ -26,7 +25,7 @@ export default function AppBar() {
     window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [setExpanded, setIsMobile]);
 
   return (
     <div className="relative flex h-16">
@@ -46,7 +45,6 @@ export default function AppBar() {
 
         <h1 className="flex-grow text-gray-600 text-lg">CMS</h1>
 
-        {/* Settings icon */}
         <button className="focus:outline-none">
           <Settings className="text-gray-600" />
         </button>

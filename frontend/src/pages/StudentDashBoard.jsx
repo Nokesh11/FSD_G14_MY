@@ -11,13 +11,14 @@ export const sidebarContext = createContext();
 
 function StudentDashboard() {
   const [expanded, setExpanded] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
-      <sidebarContext.Provider value={{ expanded, setExpanded }}>
+      <sidebarContext.Provider value={{ expanded, setExpanded, isMobile, setIsMobile }}>
         <Appbar />
         <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
-          <Sidebar />
+          <Box maxWidth="200px"><Sidebar /></Box>
           <Box
             sx={{
               flexGrow: 1,

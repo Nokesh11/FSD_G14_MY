@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import StudentDashboard from "./pages/StudentDashBoard";
 import Login from "./pages/Login";
+import AdminLogin from "./pages/SuperAdmin/AdminLogin";
 
 function App() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -18,6 +19,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/dashboard" element={<StudentDashboard />} />
+          <Route path="/admin" element={<AdminLogin />}></Route>
         </Routes>
     </Router>
   );

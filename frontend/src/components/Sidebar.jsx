@@ -4,11 +4,13 @@ import { student as StudentItems } from "../Constants/Student.js";
 import { sidebarContext } from "../pages/StudentDashBoard";
 
 function Sidebar() {
-  const { expanded } = useContext(sidebarContext);
+  const { expanded, isMobile } = useContext(sidebarContext);
+  if (isMobile && !expanded) {
+    return null;
+  }
   return (
     <aside
-      className={`h-full overflow-hidden top-2 transition-all duration-300 ${expanded ? "width: 64px" : "width: 16px"
-        }`}
+      className={`h-full overflow-hidden top-2 transition-all duration-300 ${expanded ? "w-full" : "w-[72px]"}`}
     >
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <ul className="flex-1 px-3 my-1">
