@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState } from "react";
 import { ChevronFirst, AlignLeft, Settings } from "lucide-react";
-import { sidebarContext } from "../pages/StudentDashBoard";
+import { sidebarContext } from "../pages/Student/StudentDashBoard";
 
 
 export default function AppBar() {

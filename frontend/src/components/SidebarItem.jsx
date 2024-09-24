@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { sidebarContext } from "../pages/StudentDashBoard";
+import { sidebarContext } from "../pages/Student/StudentDashBoard";
 
 function SidebarItem({ icon, text, active, alert }) {
   const { expanded } = useContext(sidebarContext);

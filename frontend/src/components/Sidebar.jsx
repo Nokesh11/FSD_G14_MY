@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import SidebarItem from "./SidebarItem";
 import { student as StudentItems } from "../Constants/Student.js";
-import { sidebarContext } from "../pages/StudentDashBoard";
+import { sidebarContext } from "../pages/Student/StudentDashBoard.jsx";
 
 function Sidebar() {
   const { expanded, isMobile } = useContext(sidebarContext);
