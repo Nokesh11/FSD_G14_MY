@@ -9,8 +9,6 @@ import {
   Paper,
   Box,
   Typography,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import { Info } from "lucide-react";
 
