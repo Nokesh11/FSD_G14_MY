@@ -10,15 +10,20 @@ export class Central
 /*
     _id : string, (User ID)
     passHash : string,
+    active_tickets : Array<strings>,
+    resolved_tickets : Array<strings>,
 */
     public admin_col : Collection;
 /*
     _id : string (User ID)
-    passHash : string
+    passHash : string,
+    active_tickets : Array<strings>,
+    resolved_tickets : Array<strings>,
 */
     public ticket_col : Collection;
 /*
     _id : string (ticket ID)
+    stages : Array<string>
 */
     public token_col : Collection;
 /*  
