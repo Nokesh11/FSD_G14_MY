@@ -93,13 +93,13 @@ function StudentDashboard() {
               height: "100%",
               padding: 3,
               overflow: "auto",
-              bgcolor: "#f5f5f5",
+              bgcolor: "white",
             }}
           >
             {/* Metrics Overview */}
             <Grid container spacing={4} sx={{ mb: 4 }}>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ boxShadow: 3 }}>
+              <Grid item xs={12} sm={4}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       CGPA
@@ -110,8 +110,8 @@ function StudentDashboard() {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ boxShadow: 3 }}>
+              <Grid item xs={12} sm={4}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Upcoming Assignments
@@ -122,8 +122,8 @@ function StudentDashboard() {
                   </CardContent>
                 </Card>
               </Grid>
-              <Grid item xs={12} md={4}>
-                <Card sx={{ boxShadow: 3 }}>
+              <Grid item xs={12} sm={4}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       New Tickets
@@ -137,17 +137,10 @@ function StudentDashboard() {
             </Grid>
 
             {/* Main Dashboard Content */}
-            <Grid container spacing={2}>
+            <Grid container spacing={4}>
               {/* Attendance Chart */}
-              <Grid item xs={12} lg={6}>
-                <Card
-                  sx={{
-                    height: "100%",
-                    boxShadow: 3,
-                    display: "flex",
-                    flexDirection: "column",
-                  }}
-                >
+              <Grid item xs={12} sm={6}>
+                <Card sx={{ height: "100%", boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Attendance Overview
@@ -160,16 +153,13 @@ function StudentDashboard() {
                   </CardContent>
                 </Card>
               </Grid>
+
               {/* Schedule and Calendar Section */}
-              <Grid item xs={12} lg={6}>
-                <Grid
-                  container
-                  spacing={2}
-                  direction={{ sm: "column", md: "row" }}
-                >
+              <Grid item xs={12} sm={6}>
+                <Grid container spacing={2} direction={{ sm: "column", md: "row" }}>
                   {/* Schedule and Tabs Card */}
                   <Grid item sm={12} md={6}>
-                    <Card sx={{ height: "380px", boxShadow: 3 }}>
+                    <Card sx={{ height: "380px", boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <Typography variant="h6" gutterBottom>
                           Today's Schedule & Tasks
@@ -214,7 +204,7 @@ function StudentDashboard() {
                             ))}
                           </Box>
                         ) : (
-                          <Box sx={{ p: 2 }}>
+                          <Box sx={{ p: 2, position: "relative", overflow: "auto", height: 300 }}>
                             {/* Tasks content */}
                             {selectedDateTasks.length === 0 ? (
                               <Typography>No tasks for this day.</Typography>
@@ -246,7 +236,23 @@ function StudentDashboard() {
                                 </Box>
                               ))
                             )}
+
+                            {/* Add Task Floating Button (sticky and fixed in position) */}
+                            <Fab
+                              color="primary"
+                              aria-label="add"
+                              sx={{
+                                position: "sticky",
+                                bottom: 20,  // Distance from the bottom of the scroll container
+                                left: 210,   // Distance from the right edge of the scroll container
+                                zIndex: 1,   // Ensure the Fab is on top
+                              }}
+                              onClick={() => setOpenDialog(true)}
+                            >
+                              <AddIcon />
+                            </Fab>
                           </Box>
+
                         )}
                       </CardContent>
                     </Card>
@@ -254,7 +260,7 @@ function StudentDashboard() {
 
                   {/* Calendar Card */}
                   <Grid item sm={12} md={6}>
-                    <Card sx={{ height: "380px", boxShadow: 3, width: "300px" }}>
+                    <Card sx={{ height: "380px", boxShadow: 3, width: "300px", backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                         <Typography variant="h6" gutterBottom>
                           Calendar
@@ -263,7 +269,7 @@ function StudentDashboard() {
                           sx={{
                             width: "100%",
                             minWidth: "280px",
-                            pl: { md: 2, xs: 0 },
+                            // pl: { md: 2, xs: 0 },
                           }}
                         >
                           <Calendar
@@ -279,15 +285,11 @@ function StudentDashboard() {
 
               {/* Other sections remain unchanged */}
               <Grid item xs={12} lg={8}>
-                <Card sx={{ boxShadow: 3 }}>
-                  <CardContent>
-                    <TicketTable />
-                  </CardContent>
-                </Card>
+                <TicketTable />
               </Grid>
-              <Grid item xs={12} md={12} lg={4}>
-                <Card sx={{ boxShadow: 3 }}>
-                  <CardContent>
+              <Grid item xs={12} sm={4}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
+                  <CardContent sx={{ display: "flex", flexDirection: "column" }}>
                     <AnnouncementsTable />
                   </CardContent>
                 </Card>
@@ -297,40 +299,36 @@ function StudentDashboard() {
           </Box>
         </Box>
 
-        {/* Floating Add Button */}
+        {/* Add Task Floating Action Button
         <Fab
           color="primary"
           aria-label="add"
-          onClick={() => setOpenDialog(true)}
           sx={{
             position: "fixed",
             bottom: 16,
             right: 16,
           }}
+          onClick={() => setOpenDialog(true)}
         >
           <AddIcon />
-        </Fab>
+        </Fab> */}
 
         {/* Add Task Dialog */}
         <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
-          <DialogTitle>Add Task</DialogTitle>
+          <DialogTitle>Add New Task</DialogTitle>
           <DialogContent>
             <TextField
-              label="New Task"
-              variant="outlined"
+              autoFocus
+              margin="dense"
+              label="Task Description"
               fullWidth
               value={newTask}
               onChange={(e) => setNewTask(e.target.value)}
-              margin="normal"
             />
           </DialogContent>
           <DialogActions>
-            <Button onClick={() => setOpenDialog(false)} color="primary">
-              Cancel
-            </Button>
-            <Button onClick={addTask} color="primary" variant="contained">
-              Add
-            </Button>
+            <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+            <Button onClick={addTask}>Add Task</Button>
           </DialogActions>
         </Dialog>
       </sidebarContext.Provider>
