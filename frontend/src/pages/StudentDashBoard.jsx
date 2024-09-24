@@ -14,7 +14,7 @@ function StudentDashboard() {
   const [isMobile, setIsMobile] = useState(false);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", width: "100vw" }}>
       <sidebarContext.Provider value={{ expanded, setExpanded, isMobile, setIsMobile }}>
         <Appbar />
         <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
