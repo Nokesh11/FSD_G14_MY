@@ -1,26 +1,8 @@
-import React, {useContext} from "react";
-import {
-  Tabs,
-  Tab,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  TextField,
-} from "@mui/material";
-import { sidebarContext } from "../pages/StudentDashBoard";
-import { Plus } from "lucide-react";
+import React from "react";
 import { useTable } from "react-table";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 // Ticket data creation function
 function createTicketData(serial, status, description, recipient) {
@@ -70,7 +52,11 @@ export default function TicketTable() {
   const [newTicket, setNewTicket] = React.useState({
     description: "",
     recipient: "",
-  }); 
+  }); // State for new ticket input
+
+  // Media query to detect small screen
+  const isSmallScreen = useMediaQuery("(max-width:730px)");
+  const isSmallScreenB = useMediaQuery("(max-width:970px)");
 
   // Handle tab change
   const handleTabChange = (index) => {
@@ -157,84 +143,42 @@ export default function TicketTable() {
     );
   };
 
-  const {isMobile} = useContext(sidebarContext);
-
   return (
     <div style={styles.card}>
-      <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
-        {/* New Ticket Button */}
-        {isMobile ? <Button
-              onClick={handleOpenDialog}
-              color="white"
-              style={{
-                position: "absolute",
-                top: 0,
-                right: 0,
-                zIndex: 1000, 
-                backgroundColor: "#1565c0",
-                height: "40px",
-                width: "40px"
-              }}>
-              <IconButton><Plus color="white"/></IconButton>
-            </Button> :
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenDialog}
-            style={{
-              position: "absolute",
-              top: "5px",
-              right: "10px",
-              zIndex: 1000, 
-            }}
-          >
-            Add New Ticket
-          </Button>
-        }
-
-        {/* Dialog for adding new ticket */}
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Add New Ticket</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Description"
-              type="text"
-              fullWidth
-              name="description"
-              value={newTicket.description}
-              onChange={handleInputChange}
-            />
-            <TextField
-              margin="dense"
-              label="Recipient"
-              type="text"
-              fullWidth
-              name="recipient"
-              value={newTicket.recipient}
-              onChange={handleInputChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} color="primary">
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          aria-label="ticket tabs"
+      {/* New Ticket Button */}
+      {isSmallScreenB ? (
+        // Use IconButton with plus icon for small screens
+        <IconButton
+          onClick={handleOpenDialog}
+          sx={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            zIndex: 1000, // Ensures it's above other elements
+            backgroundColor: "#904dd3", // Custom background color (purple)
+            color: "#fff", // Custom icon color (white)
+          }}
         >
-          <Tab label="Pending" />
-          <Tab label="Completed" />
-        </Tabs>
-        </Box>
+          <AddIcon />
+        </IconButton>
+      ) : (
+        // Full button for larger screens
+        <Button
+          variant="contained"
+          onClick={handleOpenDialog}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            zIndex: 1000, // Ensures it's above other elements
+            backgroundColor: "#904dd3", // Custom background color (purple)
+            color: "#fff", // Custom text color (white)
+            borderRadius: "5px", // Example: custom border radius
+          }}
+        >
+          Add New Ticket
+        </Button>
+      )}
 
       {/* Dialog for adding new ticket */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
