@@ -20,6 +20,7 @@ import {
 } from "@mui/material";
 import { sidebarContext } from "../pages/StudentDashBoard";
 import { Plus } from "lucide-react";
+import { useTable } from "react-table";
 
 // Ticket data creation function
 function createTicketData(serial, status, description, recipient) {
@@ -69,11 +70,7 @@ export default function TicketTable() {
   const [newTicket, setNewTicket] = React.useState({
     description: "",
     recipient: "",
-  }); // State for new ticket input
-
-  // Media query to detect small screen
-  const isSmallScreen = useMediaQuery("(max-width:730px)");
-  const isSmallScreenB = useMediaQuery("(max-width:970px)");
+  }); 
 
   // Handle tab change
   const handleTabChange = (index) => {
@@ -237,6 +234,7 @@ export default function TicketTable() {
           <Tab label="Pending" />
           <Tab label="Completed" />
         </Tabs>
+        </Box>
 
       {/* Dialog for adding new ticket */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
