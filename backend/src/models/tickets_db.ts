@@ -1,7 +1,6 @@
-import { Db, Collection, ObjectId, Document } from 'mongodb';
-import { userType, ticketStatus } from '../shared';
-import { Central } from './central';
-import { AuthDB } from './auth_db';
+import { ObjectId } from 'mongodb';
+import { userType} from '../shared';
+import { Central } from './central_db';
 
 interface TicketInterface //InterfaceTicket
 {
@@ -36,7 +35,6 @@ export function Ticket (this : TicketInterface, fromID : string,
 
 export class TicketDB
 {
-
     public static async createTicket(ticket : TicketInterface, instID : string) : Promise<string | null>
     {
         const instDB = await Central.getInstDB('admin');
@@ -128,13 +126,51 @@ export class TicketDB
     {
         return new Promise<TicketInterface | null>(async (resolve, reject) => {
             const instDB = await Central.getInstDB(instID);
-            if (instDB === null)
-            {
-                resolve(null);
-            }
-            const ticket = await instDB.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
+            const ticket = await instDB?.ticket_col.findOne({'_id' : new ObjectId(ticketID)}) ?? null;
             return ticket;
 
         });
     }
+
+    public static async getActiveTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    {
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return null;
+        }
+        const col = Central.getCol(type, instDB);
+        if (col === null)
+        {
+            return null;
+        }
+        const user = await Central.getUser(userID, col);
+        if (user === null)
+        {
+            return null;
+        }
+        const tickets = user.active_tickets;
+        return tickets;
+    }
+
+    public static async getResolvedTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    {
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return null;
+        }
+        const col = Central.getCol(type, instDB);
+        if (col === null)
+        {
+            return null;
+        }
+        const user = await Central.getUser(userID, col);
+        if (user === null)
+        {
+            return null;
+        }
+        const tickets = user.resolved_tickets;
+        return tickets;
+    }   
 }

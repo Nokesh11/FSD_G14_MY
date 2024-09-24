@@ -5,7 +5,7 @@ import MongoClient from 'mongodb';
 /*          Router imports                */
 import { app as authRouter } from './controllers/auth_routes';
 
-import { Central } from './models/central';
+import { Central } from './models/central_db';
 import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS, PORT } from './config';
 
 Central.init()
