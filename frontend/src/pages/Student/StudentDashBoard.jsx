@@ -1,11 +1,11 @@
 import { Box, Grid, Typography, Card, CardContent } from "@mui/material";
 import React, { createContext, useState } from "react";
-import Appbar from "../components/Appbar";
-import Calender from "../components/Calender";
-import Sidebar from "../components/Sidebar";
-import AttendanceChart from "../components/AttendanceChart";
-import TicketTable from "../components/TicketTable";
-import AnnouncementsTable from "../components/Announcements";
+import Appbar from "../../components/Appbar";
+import Calender from "../../components/Calender";
+import Sidebar from "../../components/Sidebar";
+import AttendanceChart from "../../components/AttendanceChart";
+import TicketTable from "../../components/TicketTable";
+import AnnouncementsTable from "../../components/Announcements";
 
 export const sidebarContext = createContext();
 
