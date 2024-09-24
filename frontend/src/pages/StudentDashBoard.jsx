@@ -14,7 +14,7 @@ function StudentDashboard() {
   const [isMobile, setIsMobile] = useState(false);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh", color: "#f7f7f7" }}>
       <sidebarContext.Provider value={{ expanded, setExpanded, isMobile, setIsMobile }}>
         <Appbar />
         <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
@@ -26,14 +26,14 @@ function StudentDashboard() {
               height: "100%",
               padding: 3,
               overflow: "auto",
-              bgcolor: "#f5f5f5", // Light background for dashboard
+              bgcolor: "#ffffff", // Light background for dashboard
             }}
           >
             {/* Metrics Overview */}
             <Grid container spacing={4} sx={{ mb: 4 }}>
               <Grid item xs={12} sm={4}>
-                <Card sx={{ boxShadow: 3 }}>
-                  <CardContent>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
+                  <CardContent >
                     <Typography variant="h6" gutterBottom>
                       CGPA
                     </Typography>
@@ -44,7 +44,7 @@ function StudentDashboard() {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Card sx={{ boxShadow: 3 }}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Upcoming Assignments
@@ -56,7 +56,7 @@ function StudentDashboard() {
                 </Card>
               </Grid>
               <Grid item xs={12} sm={4}>
-                <Card sx={{ boxShadow: 3 }}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       New Tickets
@@ -73,7 +73,7 @@ function StudentDashboard() {
             <Grid container spacing={4}>
               {/* Attendance Chart */}
               <Grid item xs={12} sm={6}>
-                <Card sx={{ height: "100%", boxShadow: 3 }}>
+                <Card sx={{ height: "100%", boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Attendance Overview
@@ -87,7 +87,7 @@ function StudentDashboard() {
 
               {/* Schedule and Calendar Section */}
               <Grid item xs={12} sm={6}>
-                <Card sx={{ height: "100%", boxShadow: 3 }}>
+                <Card sx={{ height: "100%", boxShadow: 3, bgcolor: "#f7f7f7" }}>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
                       Today's Schedule & Calendar
@@ -121,6 +121,7 @@ function StudentDashboard() {
                                 borderRadius: 1,
                                 display: "flex",
                                 justifyContent: "space-between",
+                                color: "#904dd3"
                               }}
                             >
                               <Typography variant="body2">{item}</Typography>
@@ -148,26 +149,23 @@ function StudentDashboard() {
 
               {/* Tickets Table */}
               <Grid item xs={12} sm={8}>
-                <Card sx={{ boxShadow: 3 }}>
-                  <CardContent sx={{ display: "flex", flexDirection: "column" }}>
-                    <TicketTable />
-                  </CardContent>
-                </Card>
+                <TicketTable />
               </Grid>
 
               {/* Announcements Table */}
               <Grid item xs={12} sm={4}>
-                <Card sx={{ boxShadow: 3 }}>
+                <Card sx={{ boxShadow: 3, backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)' }}>
                   <CardContent sx={{ display: "flex", flexDirection: "column" }}>
                     <AnnouncementsTable />
                   </CardContent>
                 </Card>
               </Grid>
+
             </Grid>
           </Box>
-        </Box>
-      </sidebarContext.Provider>
-    </Box>
+        </Box >
+      </sidebarContext.Provider >
+    </Box >
   );
 }
 

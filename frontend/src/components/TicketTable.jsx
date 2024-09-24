@@ -1,22 +1,8 @@
-import * as React from "react";
-import {
-  Tabs,
-  Tab,
-  Box,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  TextField,
-} from "@mui/material";
+import React from "react";
+import { useTable } from "react-table";
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 // Ticket data creation function
 function createTicketData(serial, status, description, recipient) {
@@ -39,6 +25,25 @@ const completedRows = [
   createTicketData(9, "Resolved", "Code optimization", "Charlie James"),
 ];
 
+const columns = [
+  {
+    Header: "Serial Number",
+    accessor: "serial", // accessor is the "key" in the data
+  },
+  {
+    Header: "Status",
+    accessor: "status",
+  },
+  {
+    Header: "Description",
+    accessor: "description",
+  },
+  {
+    Header: "Recipient",
+    accessor: "recipient",
+  },
+];
+
 // Main component with tabs and new ticket functionality
 export default function TicketTable() {
   const [tabIndex, setTabIndex] = React.useState(0);
@@ -49,9 +54,13 @@ export default function TicketTable() {
     recipient: "",
   }); // State for new ticket input
 
+  // Media query to detect small screen
+  const isSmallScreen = useMediaQuery("(max-width:730px)");
+  const isSmallScreenB = useMediaQuery("(max-width:970px)");
+
   // Handle tab change
-  const handleTabChange = (event, newValue) => {
-    setTabIndex(newValue);
+  const handleTabChange = (index) => {
+    setTabIndex(index);
   };
 
   // Handle form input change
@@ -78,131 +87,172 @@ export default function TicketTable() {
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  // Table rendering function
-  const renderTable = (rows) => (
-    <React.Fragment>
-      <TableContainer
-        component={Paper}
-        sx={{
-          overflowY: "auto", // Enable vertical scrolling without restricting height
-        }}
-      >
-        <Table stickyHeader sx={{ minWidth: "50%" }} aria-label="ticket table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Serial Number</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Recipient</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((ticket) => (
-              <TableRow
-                key={ticket.serial}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {ticket.serial}
-                </TableCell>
-                <TableCell>{ticket.status}</TableCell>
-                <TableCell>{ticket.description}</TableCell>
-                <TableCell>{ticket.recipient}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    </React.Fragment>
-  );
+  // Table component using useTable hook
+  const TableComponent = ({ data }) => {
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+      columns,
+      data,
+    });
+
+    return (
+      <table {...getTableProps()} style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th
+                  {...column.getHeaderProps()}
+                  style={{
+                    padding: "10px",
+                    borderBottom: "1px solid #ddd",
+                    backgroundColor: "#f5f5f5",
+                    textAlign: "left",
+                    color: "black",
+                  }}
+                >
+                  {column.render("Header")}
+                </th>
+              ))}
+            </tr>
+          ))}
+        </thead>
+        <tbody {...getTableBodyProps()}>
+          {rows.map(row => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => {
+                  return (
+                    <td
+                      {...cell.getCellProps()}
+                      style={{
+                        padding: "10px",
+                        borderBottom: "1px solid #ddd",
+                        color: "black",
+                      }}
+                    >
+                      {cell.render("Cell")}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    );
+  };
 
   return (
     <div style={styles.card}>
-      <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
-        {/* New Ticket Button */}
-        {
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={handleOpenDialog}
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              zIndex: 1000, // Ensures it's above other elements
-            }}
-          >
-            Add New Ticket
-          </Button>
-        }
-
-        {/* Dialog for adding new ticket */}
-        <Dialog open={openDialog} onClose={handleCloseDialog}>
-          <DialogTitle>Add New Ticket</DialogTitle>
-          <DialogContent>
-            <TextField
-              autoFocus
-              margin="dense"
-              label="Description"
-              type="text"
-              fullWidth
-              name="description"
-              value={newTicket.description}
-              onChange={handleInputChange}
-            />
-            <TextField
-              margin="dense"
-              label="Recipient"
-              type="text"
-              fullWidth
-              name="recipient"
-              value={newTicket.recipient}
-              onChange={handleInputChange}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseDialog} color="secondary">
-              Cancel
-            </Button>
-            <Button onClick={handleSubmit} color="primary">
-              Submit
-            </Button>
-          </DialogActions>
-        </Dialog>
-
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          aria-label="ticket tabs"
+      {/* New Ticket Button */}
+      {isSmallScreenB ? (
+        // Use IconButton with plus icon for small screens
+        <IconButton
+          onClick={handleOpenDialog}
+          sx={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            zIndex: 1000, // Ensures it's above other elements
+            backgroundColor: "#904dd3", // Custom background color (purple)
+            color: "#fff", // Custom icon color (white)
+          }}
         >
-          <Tab label="Pending Tickets" />
-          <Tab label="Completed Tickets" />
-        </Tabs>
+          <AddIcon />
+        </IconButton>
+      ) : (
+        // Full button for larger screens
+        <Button
+          variant="contained"
+          onClick={handleOpenDialog}
+          style={{
+            position: "absolute",
+            top: "10px",
+            right: "10px",
+            zIndex: 1000, // Ensures it's above other elements
+            backgroundColor: "#904dd3", // Custom background color (purple)
+            color: "#fff", // Custom text color (white)
+            borderRadius: "5px", // Example: custom border radius
+          }}
+        >
+          Add New Ticket
+        </Button>
+      )}
 
-        {/* Render table based on selected tab */}
-        <Box sx={{ height: "85%", position: "relative", overflow: "hidden" }}>
-          {tabIndex === 0 && renderTable(pendingRows)}
-          {tabIndex === 1 && renderTable(completedRows)}
-        </Box>
-      </Box>
+      {/* Dialog for adding new ticket */}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Add New Ticket</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Description"
+            type="text"
+            fullWidth
+            name="description"
+            value={newTicket.description}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
+            label="Recipient"
+            type="text"
+            fullWidth
+            name="recipient"
+            value={newTicket.recipient}
+            onChange={handleInputChange}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSubmit} color="secondary">
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Render Tabs */}
+      <div>
+        <Button
+          onClick={() => handleTabChange(0)}
+          style={{
+            backgroundColor: tabIndex === 0 ? "#904dd3" : "#f5f5f5",
+            color: tabIndex === 0 ? "#fff" : "#000",
+            marginRight: "10px",
+          }}
+        >
+          Pending Tickets
+        </Button>
+        <Button
+          onClick={() => handleTabChange(1)}
+          style={{
+            backgroundColor: tabIndex === 1 ? "#904dd3" : "#f5f5f5",
+            color: tabIndex === 1 ? "#fff" : "#000",
+          }}
+        >
+          Completed Tickets
+        </Button>
+      </div>
+
+      {/* Render Table based on tab index */}
+      {tabIndex === 0 && <TableComponent data={pendingRows} />}
+      {tabIndex === 1 && <TableComponent data={completedRows} />}
     </div>
   );
 }
 
-// Simple card styles
+// Styles for card
 const styles = {
   card: {
     width: "100%",
-    height: "100%", // Full height of the viewport
-    margin: "0.1rem",
-    padding: "1rem",
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-    borderRadius: "8px",
+    height: "100%",
+    position: "relative",
+    padding: "20px",
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
+    borderRadius: "10px",
     backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)",
-  },
-  newTicketButton: {
-    position: "absolute",
-    top: "10px",
-    right: "10px",
   },
 };

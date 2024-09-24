@@ -4,7 +4,7 @@ import { sidebarContext } from "../pages/StudentDashBoard";
 
 
 export default function AppBar() {
-  const {expanded, setExpanded, setIsMobile} = useContext(sidebarContext);
+  const { expanded, setExpanded, setIsMobile } = useContext(sidebarContext);
 
   useEffect(() => {
     const handleResize = () => {
@@ -31,11 +31,16 @@ export default function AppBar() {
     <div className="relative flex h-16">
       <div className="fixed top-0 left-0 w-full bg-white h-16 flex items-center shadow-md px-4 z-10">
         <button
-          className="p-1.5 rounded-lg bg-gray-50 hover:bg-gray-100 mr-4"
+          className="p-1.5 rounded-lg mr-4"
           onClick={() => setExpanded((curr) => !curr)}
+          style={{ backgroundColor: '#904dd3' }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = '#6d28d9')}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = '#904dd3')}
         >
           {expanded ? <ChevronFirst /> : <AlignLeft />}
         </button>
+
+
 
         <img
           src="https://img.logoipsum.com/243.svg"
@@ -46,7 +51,7 @@ export default function AppBar() {
         <h1 className="flex-grow text-gray-600 text-lg">CMS</h1>
 
         <button className="focus:outline-none">
-          <Settings className="text-gray-600" />
+          <Settings style={{ color: "#904dd3" }} />
         </button>
       </div>
     </div>

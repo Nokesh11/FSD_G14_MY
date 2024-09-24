@@ -1,24 +1,27 @@
 import React, { PureComponent } from 'react';
 import { PieChart, Pie, Cell, Label } from 'recharts';
+import Slider from "react-slick";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 // Mock data for different subjects
 const subjects = [
-    { name: 'Math', attended: 25, unattended: 5 },
-    { name: 'Physics', attended: 22, unattended: 8 },
-    { name: 'Chemistry', attended: 27, unattended: 3 },
-    { name: 'Biology', attended: 28, unattended: 2 },
-    { name: 'English', attended: 20, unattended: 10 },
-    { name: 'History', attended: 18, unattended: 12 },
+    { name: 'FDFED', attended: 25, unattended: 5 },
+    { name: 'ICS', attended: 22, unattended: 8 },
+    { name: 'BTA', attended: 27, unattended: 3 },
+    { name: 'NLP', attended: 28, unattended: 2 },
+    { name: 'CGM', attended: 20, unattended: 10 },
+    { name: 'IDA', attended: 18, unattended: 12 },
 ];
 
 // Colors for attended portion (unattended will be white)
 const COLORS = [
-    ['#0088FE', '#f7f7f7'], // Math
-    ['#FFBB28', '#f7f7f7'], // Physics
-    ['#FF6384', '#f7f7f7'], // Chemistry
-    ['#4BC0C0', '#f7f7f7'], // Biology
-    ['#9966FF', '#f7f7f7'], // English
-    ['#66FF66', '#f7f7f7'], // History
+    ['#0088FE', '#f7f7f7'], // FDFED
+    ['#FFBB28', '#f7f7f7'], // ICS
+    ['#FF6384', '#f7f7f7'], // BTA
+    ['#4BC0C0', '#f7f7f7'], // NLP
+    ['#9966FF', '#f7f7f7'], // CGM
+    ['#66FF66', '#f7f7f7'], // IDA
 ];
 
 export default class AttendanceChart extends PureComponent {
@@ -56,11 +59,29 @@ export default class AttendanceChart extends PureComponent {
     );
 
     render() {
+        // Slick slider settings
+        const settings = {
+            dots: true,
+            infinite: true,
+            speed: 500,
+            slidesToShow: 3, // Show 3 charts at once
+            slidesToScroll: 3,
+            responsive: [
+                {
+                    breakpoint: 768,
+                    settings: {
+                        slidesToShow: 1, // Show 1 chart at once for small screens
+                        slidesToScroll: 1,
+                    },
+                },
+            ],
+        };
+
         return (
             <div style={styles.card}>
-                <div style={styles.chartWrapper}>
+                <Slider {...settings}>
                     {subjects.map((subject, index) => this.renderPieChart(subject, index))}
-                </div>
+                </Slider>
             </div>
         );
     }
@@ -71,33 +92,20 @@ const styles = {
     card: {
         width: '100%',
         height: '100%',
-        // margin: '0.1rem',
-        // padding: '0.1rem',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        // boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
         borderRadius: '8px',
-        backgroundImage: 'linear-gradient(to bottom, #ffffff, #f0f0f0)',
-        overflowX: 'auto', // Add horizontal scroll
-    },
-    cardTitle: {
-        marginBottom: '20px',
-        fontSize: '1.5em',
-        color: '#333',
-        textAlign: 'center',
-    },
-    chartWrapper: {
-        display: 'flex',
-        flexDirection: 'row',
-        overflowX: 'scroll', // Enable horizontal scroll
-        paddingBottom: '1rem',
+        // backgroundImage: 'linear-gradient(to bottom, #904dd3, #6d28d9)',
+        padding: '1rem',
+        color: "#ffffff"
     },
     chartContainer: {
-        flex: '0 0 auto', // Prevent charts from shrinking
-        // margin: '0 1rem', // Add space between charts
         textAlign: 'center',
+        padding: '0 1rem',
     },
     subjectLabel: {
-        margin: '10px',
+        margin: '10px 0',
         fontSize: '1.1em',
         color: '#333',
+        textAlign: 'center',
     },
 };

@@ -13,7 +13,7 @@ function Sidebar() {
       className={`h-full overflow-hidden top-2 transition-all duration-300 ${expanded ? "w-full" : "w-[72px]"}`}
     >
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
-        <ul className="flex-1 px-3 my-1">
+        <ul className="flex-1 px-3 my-1 text-black">
           {StudentItems.map((item, index) => (
             <SidebarItem
               key={index}
@@ -36,7 +36,7 @@ function Sidebar() {
               }`}
           >
             {expanded && (<div className="leading-4">
-              <p className="font-semibold mb-0">John Doe</p>
+              <p className="font-semibold mb-0 text-black">John Doe</p>
               <span className="text-xs mt-0 text-gray-600">
                 johnDoe@gmail.com
               </span>

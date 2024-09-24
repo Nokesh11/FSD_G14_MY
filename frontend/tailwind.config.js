@@ -29,7 +29,7 @@ module.exports = {
         neonOrange: '#ff9f1c',
         neonPink: '#ff00ff',
         neonRed: '#ff073a', // Neon Red
-        custom: 'var(--user-selected-color)', 
+        custom: 'var(--user-selected-color)',
       },
       fontFamily: {
         heading: ['Playfair Display', 'serif'], // Font for headings
