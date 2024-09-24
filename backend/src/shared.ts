@@ -1,5 +1,5 @@
 export const enum userType {STUDENT, ADMIN};
-export const enum ticketStatus {ACTIVE, RESOLVED};
+export const enum ticketStatus {RESOLVED, PENDING};
 export enum debugEnum 
 {
     INVALID_CREDENTIALS, 
