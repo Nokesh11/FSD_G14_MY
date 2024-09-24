@@ -1,5 +1,8 @@
 import React from "react";
 import {
+  useTable
+} from "react-table";
+import {
   Table,
   TableBody,
   TableCell,
@@ -9,8 +12,6 @@ import {
   Paper,
   Box,
   Typography,
-  IconButton,
-  Tooltip,
 } from "@mui/material";
 import { Info } from "lucide-react";
 
@@ -29,40 +30,65 @@ const initialAnnouncements = [
 ];
 
 export default function AnnouncementsTable() {
+  // Define the columns
+  const columns = React.useMemo(
+    () => [
+      {
+        Header: "Announcements",
+        accessor: "text", // accessor is the "key" in the data
+      },
+    ],
+    []
+  );
+
+  // Use the react-table hook
+  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
+    columns,
+    data: initialAnnouncements,
+  });
+
   return (
-    <Box sx={{ width: "100%", height: "100%", position: "relative" }}>
+    <Box sx={{ width: "100%", height: "100%", position: "relative", backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)", border: "none" }}>
       <TableContainer
         component={Paper}
         sx={{ overflowY: "auto", marginTop: 1 }}
       >
-        <Table stickyHeader aria-label="announcements table">
+        <Table stickyHeader {...getTableProps()} aria-label="announcements table">
           <TableHead>
-            <TableRow>
-              <TableCell>
-                <Typography
-                  variant="h6"
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    color: "black",
-                    gap: 1,
-                  }}
-                >
-                  <Info />
-                  Announcements
-                </Typography>
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {initialAnnouncements.map((announcement, index) => (
-              <TableRow
-                key={index}
-                sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-              >
-                <TableCell>{announcement.text}</TableCell>
+            {headerGroups.map(headerGroup => (
+              <TableRow {...headerGroup.getHeaderGroupProps()}>
+                {headerGroup.headers.map(column => (
+                  <TableCell {...column.getHeaderProps()}>
+                    <Typography
+                      variant="h6"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color: "black",
+                        gap: 1,
+                      }}
+                    >
+                      <Info />
+                      {column.render('Header')}
+                    </Typography>
+                  </TableCell>
+                ))}
               </TableRow>
             ))}
+          </TableHead>
+          <TableBody {...getTableBodyProps()}>
+            {rows.map(row => {
+              prepareRow(row);
+              return (
+                <TableRow {...row.getRowProps()}>
+                  {row.cells.map(cell => (
+                    <TableCell {...cell.getCellProps()}>
+                      {cell.render('Cell')}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>

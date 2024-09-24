@@ -18,16 +18,16 @@ function App() {
 
   return (
     <Router>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/dashboard" element={<StudentDashboard />} />
-          <Route path="/admin/login" element={<AdminLogin />}></Route>
-          <Route path="/admin" element={<AdminLayout />}>
-                    <Route path="dashboard" element={<AdminDashboard />} />
-                </Route>
-        </Routes>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/dashboard" element={<StudentDashboard />} />
+        <Route path="/admin/login" element={<AdminLogin />}></Route>
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+        </Route>
+      </Routes>
     </Router>
   );
 }
 
-export default App; 
+export default App;

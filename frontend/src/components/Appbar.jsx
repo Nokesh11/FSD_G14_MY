@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { ChevronFirst, AlignLeft, Settings } from "lucide-react";
 import { sidebarContext } from "../pages/StudentDashBoard";
 
@@ -27,20 +27,24 @@ export default function AppBar() {
     return () => window.removeEventListener("resize", handleResize);
   }, [setExpanded, setIsMobile]);
 
+  const [isHovered, setIsHovered] = useState(false); // State to track hover
+
   return (
     <div className="relative flex h-16">
       <div className="fixed top-0 left-0 w-full bg-white h-16 flex items-center shadow-md px-4 z-10">
+
         <button
           className="p-1.5 rounded-lg mr-4"
           onClick={() => setExpanded((curr) => !curr)}
-          style={{ backgroundColor: '#904dd3' }}
-          onMouseEnter={(e) => (e.target.style.backgroundColor = '#6d28d9')}
-          onMouseLeave={(e) => (e.target.style.backgroundColor = '#904dd3')}
+          style={{
+            backgroundColor: isHovered ? '#6d28d9' : '#904dd3', // Change color on hover
+            color: "white"
+          }}
+          onMouseEnter={() => setIsHovered(true)}  // Set hover state on enter
+          onMouseLeave={() => setIsHovered(false)} // Unset hover state on leave
         >
           {expanded ? <ChevronFirst /> : <AlignLeft />}
         </button>
-
-
 
         <img
           src="https://img.logoipsum.com/243.svg"
