@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import '../styles/LoginForm.css';
 import '../App.css';
+import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 
 const validateUsername = (username, isAdmin = false) => {
   if (!username) return "Username is required";
@@ -17,22 +19,14 @@ const validatePassword = (password) => {
   return '';
 };
 
-// const validateEmail = (email) => {
-//   if (!email) return "Email is required";
-
-//   const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-//   if (!emailRegex.test(email)) {
-//     return "Invalid email format. Must be like 'example@domain.com'";
-//   }
-//   return '';
-// };
-
 export default function LoginForm() {
   const [isActive, setIsActive] = useState(false);
-  const [loginData, setLoginData] = useState({ instituteId: '', username: '', password: '' }); //
-  const [signupData, setSignupData] = useState({ instituteId: '', username: '', password: '' });  //
+  const [loginData, setLoginData] = useState({ instituteId: '', username: '', password: '' });
+  const [signupData, setSignupData] = useState({ instituteId: '', username: '', password: '' });
   const [errors, setErrors] = useState({ login: {}, signup: {} });
-  const [usernameClass, setUsernameClass] = useState('input-box'); // Dynamic class for username field
+  const [error, setError] = useState("");
+  const [usernameClass, setUsernameClass] = useState('input-box');
+  const navigate = useNavigate();
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -41,46 +35,45 @@ export default function LoginForm() {
   const handleLoginClick = () => {
     setIsActive(false);
   };
-
-  const handleLoginSubmit = (e) => {
+  
+  const handleSubmit = async (e, role) => {
     e.preventDefault();
-    const instituteIdError = !loginData.instituteId ? 'Institute Id is required' : '';
-    const usernameError = validateUsername(loginData.username, false); // false for student login
-    const passwordError = validatePassword(loginData.password);
+    const data = role === 'admin' ? signupData : loginData; // Use the appropriate data based on the role
+
+    const instituteIdError = !data.instituteId ? 'Institute Id is required' : '';
+    const usernameError = validateUsername(data.username, role === 'admin'); // Pass role for validation
+    const passwordError = validatePassword(data.password);
   
     if (instituteIdError || usernameError || passwordError) {
-      setErrors({
-        ...errors,
-        login: { instituteId: instituteIdError, username: usernameError, password: passwordError },
-      });
+      setErrors((prevErrors) => ({
+        ...prevErrors,
+        [role]: { instituteId: instituteIdError, username: usernameError, password: passwordError },
+      }));
     } else {
-      const role = loginData.username.startsWith('S') ? 'Student' : 'Faculty';
-      alert(`Login successful! Welcome ${role}, ${loginData.username}`);
-      setLoginData({ instituteId: '', username: '', password: '' });
-      setErrors({ login: {}, signup: {} }); // Clear errors after successful login
+      const formattedData = {
+        userID: data.username,
+        password: data.password,
+        userType: role,
+        instID: data.instituteId
+      }
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/verify-creds`, formattedData);
+      if(response.status === 200){
+        localStorage.setItem('token', response.data.data.token);
+        const userRole = response.data.data.role;
+        localStorage.setItem('role', userRole);
+        if(role === "hostel-admin") navigate("/hostel/dashboard");
+        if(role === "academic-admin") navigate("/academic/dashboard");
+        if(role === "faculty") navigate("/faculty/dashboard");
+        if(role === "student") navigate("/student/dashboard");
+      }else{
+        setError(response.data.message);
+      }
+      setSignupData({ instituteId: '', username: '', password: '' });
+      setLoginData({ instituteId: '', username: '', password: '' }); // Clear both login and signup data
+      setErrors({ login: {}, signup: {} }); // Clear errors after successful login/signup
     }
   };
   
-  const handleSignupSubmit = (e) => {
-    e.preventDefault();
-    const instituteIdError = !signupData.instituteId ? 'Institute Id is required' : '';
-    const usernameError = validateUsername(signupData.username, true); // true for admin signup
-    const passwordError = validatePassword(signupData.password);
-  
-    if (instituteIdError || usernameError || passwordError) {
-      setErrors({
-        ...errors,
-        signup: { instituteId: instituteIdError, username: usernameError, password: passwordError },
-      });
-    } else {
-      const role = signupData.username.startsWith('F') ? 'Admin' : 'Student';
-      alert(`Sign Up successful! Welcome ${role}, ${signupData.username}`);
-      setSignupData({ instituteId: '', username: '', password: ''});
-      setErrors({ login: {}, signup: {} }); // Clear errors after successful signup
-    }
-  };
-  
-
   // Dynamic username field styling
   const handleUsernameChange = (e) => {
     const username = e.target.value;
@@ -126,14 +119,16 @@ export default function LoginForm() {
     <div className={`wrapper ${isActive ? "active" : ""}`}>
       <span className="rotate-bg"></span>
       <span className="rotate-bg2"></span>
+      {error ?? <p className='text-red text-sm'>{error}</p>}
+
 
       {/* Login Form */}
       <div className="form-box login">
         <h2 className="title animation" style={{ "--i": 0, "--j": 21 }}>
           Login
         </h2>
-        <form onSubmit={handleLoginSubmit}>
-        <div className="input-box animation" style={{ "--i": 1, "--j": 22 }}>
+        <form onSubmit={(e) => handleSubmit(e, 'student')}>
+          <div className="input-box animation" style={{ "--i": 1, "--j": 22 }}>
             <input
               type="text"
               value={loginData.instituteId}
@@ -150,8 +145,7 @@ export default function LoginForm() {
               onChange={handleUsernameChange}
               required
             />
-            <label>Username</label>
-            {/* <i className="bx bxs-user"></i> */}
+            <label>Student ID</label>
             {errors.login.username && <p className="error-message">{errors.login.username}</p>}
           </div>
 
@@ -163,7 +157,6 @@ export default function LoginForm() {
               required
             />
             <label>Password</label>
-            {/* <i className="bx bxs-lock-alt"></i> */}
             {errors.login.password && <p className="error-message">{errors.login.password}</p>}
           </div>
 
@@ -177,9 +170,9 @@ export default function LoginForm() {
           <div className="linkTxt animation" style={{ "--i": 5, "--j": 25 }}>
             <p>
               Are you an admin?{" "}
-              <a href="#" className="register-link" onClick={handleRegisterClick}>
+              <span className="register-link cursor-pointer text-blue-700 font-semibold" onClick={handleRegisterClick}>
                 Admin Login
-              </a>
+              </span>
             </p>
           </div>
         </form>
@@ -199,8 +192,8 @@ export default function LoginForm() {
         <h2 className="title animation" style={{ "--i": 17, "--j": 0 }}>
           Login 
         </h2>
-        <form onSubmit={handleSignupSubmit}>
-        <div className="input-box animation" style={{ "--i": 1, "--j": 22 }}>
+        <form onSubmit={(e) => handleSubmit(e, 'admin')}>
+          <div className="input-box animation" style={{ "--i": 1, "--j": 22 }}>
             <input
               type="text"
               value={signupData.instituteId}
@@ -208,7 +201,7 @@ export default function LoginForm() {
               required
             />
             <label>Institute Id</label>
-            {errors.login.instituteId && <p className="error-message">{errors.login.instituteId}</p>}
+            {errors.signup.instituteId && <p className="error-message">{errors.signup.instituteId}</p>}
           </div>
           <div className="input-box animation" style={{ "--i": 18, "--j": 1 }}>
             <input
@@ -217,8 +210,7 @@ export default function LoginForm() {
               onChange={(e) => setSignupData({ ...signupData, username: e.target.value })}
               required
             />
-            <label>Username</label>
-            {/* <i className="bx bxs-user"></i> */}
+            <label>Admin ID</label>
             {errors.signup.username && <p className="error-message">{errors.signup.username}</p>}
           </div>
 
@@ -230,7 +222,6 @@ export default function LoginForm() {
               required
             />
             <label>Password</label>
-            {/* <i className="bx bxs-lock-alt"></i> */}
             {errors.signup.password && <p className="error-message">{errors.signup.password}</p>}
           </div>
 
@@ -245,9 +236,9 @@ export default function LoginForm() {
           <div className="linkTxt animation" style={{ "--i": 22, "--j": 5 }}>
             <p>
               Are you a student?{" "}
-              <a href="#" className="login-link" onClick={handleLoginClick}>
+              <span className="login-link cursor-pointer text-blue-700 font-semibold" onClick={handleLoginClick}>
                 Student Login
-              </a>
+              </span>
             </p>
           </div>
         </form>

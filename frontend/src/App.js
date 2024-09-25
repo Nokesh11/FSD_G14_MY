@@ -10,6 +10,11 @@ import StudentLayout from "./pages/Student/StudentLayout";
 import StudentAlmanac from "./pages/Student/StudentAlmanac";
 import Attendance from "./pages/Student/Attendance";
 import StudentDocVault from "./pages/Student/StudentDocVault";
+// import AddUser from "./pages/SuperAdmin/AddUser";
+import EditUser from "./pages/SuperAdmin/EditUser";
+import AddUserCurr from "./pages/SuperAdmin/AddUserCurr";
+import Users from "./pages/SuperAdmin/Users";
+import Error404 from "./pages/Error-404";
 
 function App() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -33,8 +38,12 @@ function App() {
           <Route path="timetable" element={<StudentTimetable />} />
           <Route path="almanac" element={<StudentAlmanac />} />
         </Route>
+        <Route path="/test" element={<Error404 />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="users/add" element={<AddUserCurr /> } /> 
+          <Route path="users/edit" element={<EditUser /> } /> 
         </Route>
       </Routes>
     </Router>
