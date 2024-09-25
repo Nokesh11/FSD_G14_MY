@@ -32,7 +32,7 @@ export default function AnnouncementsTable() {
     () => [
       {
         Header: "Announcements",
-        accessor: "text", 
+        accessor: "text",
       },
     ],
     []
@@ -51,6 +51,7 @@ export default function AnnouncementsTable() {
         position: "relative",
         backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)",
         border: "none",
+        overflow: "scroll"
       }}
     >
       <TableContainer component={Paper} sx={{ overflowY: "auto", marginTop: 1 }}>
@@ -81,9 +82,9 @@ export default function AnnouncementsTable() {
             {rows.map((row, rowIndex) => {
               prepareRow(row);
               return (
-                <TableRow {...row.getRowProps()} key={`row-${rowIndex}`}>
+                <TableRow {...row.getRowProps()} key={row.id || `row-${rowIndex}`}>
                   {row.cells.map((cell, cellIndex) => (
-                    <TableCell {...cell.getCellProps()} key={`cell-${cellIndex}`}>
+                    <TableCell {...cell.getCellProps()} key={cell.column.id || `cell-${cellIndex}`}>
                       {cell.render("Cell")}
                     </TableCell>
                   ))}

@@ -1,6 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { userType} from '../shared';
 import { Central } from './central_db';
+import { debugEnum } from '../shared';
 
 interface TicketInterface //InterfaceTicket
 {
@@ -35,35 +36,30 @@ export function Ticket (this : TicketInterface, fromID : string,
 
 export class TicketDB
 {
-    public static async createTicket(ticket : TicketInterface, instID : string) : Promise<string | null>
+    public static async createTicket(ticket : TicketInterface, instID : string) : Promise<string | debugEnum>
     {
-        const instDB = await Central.getInstDB('admin');
-        if (instDB ==  null)
+        const data = await Central.getUser(ticket.fromID, ticket.from_userType, instID);
+        if (data.message !== debugEnum.SUCCESS)
         {
-            return null;
+            return data.message;
         }
-        const col = Central.getCol(ticket.from_userType, instDB);
-        if (col === null)
+        else 
         {
-            return null;
-        }
-        const user = await Central.getUser(ticket.fromID, col);
-        if (user === null)
-        {
-            return null;
-        }
-        while ( true )
-        {
-            const ticketID = this.genTicketID(ticket.fromID, ticket.toID);
-            const ticketDoc = await instDB.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
-            if (ticketDoc === null)
+            const instDB = data.instDB;
+            const col = data.col;
+            while ( true )
             {
-                ticket._id = new ObjectId(ticketID);
-                await instDB.ticket_col.insertOne(ticket);
-                let currentTickets = user.active_tickets;
-                currentTickets.push(new ObjectId(ticketID));
-                await col.updateOne({_id : new ObjectId(ticket.fromID)}, {$set : {active_tickets : currentTickets}});
-                return ticketID;
+                const ticketID = this.genTicketID(ticket.fromID, ticket.toID);
+                const ticketDoc = await instDB!.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
+                if (ticketDoc === null)
+                {
+                    ticket._id = new ObjectId(ticketID);
+                    await instDB!.ticket_col.insertOne(ticket);
+                    let currentTickets = data.user!.active_tickets;
+                    currentTickets.push(new ObjectId(ticketID));
+                    await col!.updateOne({_id : new ObjectId(ticket.fromID)}, {$set : {active_tickets : currentTickets}});
+                    return ticketID;
+                }
             }
         }
     }
@@ -75,51 +71,42 @@ export class TicketDB
         return `${fromID}_${toID}-${timeStamp}`;
     }
 
-    public static async changeStage(ticketID : string, stage : string, instID : string) : Promise<boolean>
+    public static async changeStage(ticketID : string, stage : string, instID : string) : Promise<debugEnum>
     {
         const instDB = await Central.getInstDB(instID);
         if (instDB == null)
         {
-            return false;
+            return debugEnum.INVALID_INST_ID;
         }
         const ticket = await instDB.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
         if (ticket === null)
         {
-            return false;
+            return debugEnum.INVALID_TICKET_ID;
         }
         if (ticket.stages.includes(stage))
         {
             instDB.ticket_col.updateOne({'_id' : new ObjectId(ticketID)}, {$set : {curStage : stage}});
             if (stage === "RESOLVED")
             {
-                const type = ticket.from_userType;
-                const col = Central.getCol(type, instDB);
-                if (col === null)
+                const data = await Central.getUser(ticket.fromID, ticket.from_userType, instID);
+                if (data.message === debugEnum.SUCCESS)
                 {
-                    console.log(" When ticket exists, col should also exists, but that did not happen ");
-                    return false;
+                    const col = data.col;
+                    let active_tickets = data.user!.active_tickets;
+                    let resolvedTickets = data.user!.resolved_tickets;
+                    resolvedTickets.push(ticketID);
+                    const index = active_tickets.indexOf(ticketID);
+                    active_tickets.splice(index, 1);
+                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
+                    return debugEnum.SUCCESS;
                 }
-                const user = await Central.getUser(ticket.fromID, col);
-                if (user === null)
+                else 
                 {
-                    console.log(" When ticket exists, user should also exists, but that did not happen ");
-                    return false;
+                    return data.message;
                 }
-                let currentTickets = user.active_tickets;
-                let resolved_tickets = user.resolved_tickets;
-                resolved_tickets.push(ticketID);
-                const index = currentTickets.indexOf(ticketID);
-                if (index === -1)
-                {
-                    console.log(" When ticket exists, ticketID should exist in pending_tickets, but that did not happen ");
-                    return false;
-                }
-                currentTickets.splice(index, 1);
-                await col.updateOne({'_id' : new ObjectId(ticket.fromID)}, {$set : {active_tickets : currentTickets, resolved_tickets : resolved_tickets}});
-                return true;
             }
         }
-        return false;
+        return debugEnum.INVALID_TICKET_STAGE;
     }
 
     public static getTicket(ticketID : string, instID : string) : Promise<TicketInterface | null>
@@ -134,43 +121,27 @@ export class TicketDB
 
     public static async getActiveTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
     {
-        const instDB = await Central.getInstDB(instID);
-        if (instDB === null)
+        const data = await Central.getUser(userID, type, instID);
+        if (data.message !== debugEnum.SUCCESS)
         {
             return null;
         }
-        const col = Central.getCol(type, instDB);
-        if (col === null)
+        else 
         {
-            return null;
+            return data.user!.active_tickets;
         }
-        const user = await Central.getUser(userID, col);
-        if (user === null)
-        {
-            return null;
-        }
-        const tickets = user.active_tickets;
-        return tickets;
     }
 
     public static async getResolvedTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
     {
-        const instDB = await Central.getInstDB(instID);
-        if (instDB === null)
+        const data = await Central.getUser(userID, type, instID);
+        if (data.message !== debugEnum.SUCCESS)
         {
             return null;
         }
-        const col = Central.getCol(type, instDB);
-        if (col === null)
+        else 
         {
-            return null;
+            return data.user!.resolved_tickets;
         }
-        const user = await Central.getUser(userID, col);
-        if (user === null)
-        {
-            return null;
-        }
-        const tickets = user.resolved_tickets;
-        return tickets;
     }   
 }

@@ -9,29 +9,30 @@ import { debugEnum } from '../shared';
 export class AuthDB 
 {
  
-    public static async verifyCreds (userID: string, password: string, type: userType, instID: string): Promise<debugEnum>
+    public static async verifyCreds (userID: string, password: string, type: userType, instID: string): Promise<any>
     {
         const instDB = await Central.getInstDB(instID);
 
         if (instDB === null)
         {
-            return debugEnum.INVALID_INST_ID;
+            return null;
         }
 
         const col = Central.getCol(type, instDB);
     
         if (col === null)
         {
-            return debugEnum.INVALID_USER_TYPE;
+            return null;
         }
         const passHash = AuthDB.hash(password);
         const user = await col.findOne({_id : new ObjectId(userID), passHash : passHash}); 
 
         if (user === null)
         {
-            return debugEnum.INVALID_CREDENTIALS;
+            return null;
         }
 
+        
         return debugEnum.SUCCESS;
     };
 
@@ -60,32 +61,26 @@ export class AuthDB
         return token;
     }
 
-    // Returns null if usertype or the user does not exist, else sets token and returns token
-    public static async setToken (userID : string, type : userType, instID : string): Promise<string | null>
+    // Have to set expiry for the token here ...
+    public static async setToken (userID : string, type : userType, instID : string): Promise<string | debugEnum>
     {
-        const instDB = await Central.getInstDB(instID)
-        if (instDB === null)
+        const data = await Central.getUser(userID, type, instID);
+        if (data.message !== debugEnum.SUCCESS)
         {
-            return null;
+            return data.message;
         }
-        const col = Central.getCol(type, instDB);
-        if ( col === null)
+        else 
         {
-            return null;
-        }
-        const user = await Central.getUser(userID, col);
-        if (user === null)
-        {
-            return null;
-        }
-        while ( true )
-        {
-            const token_hash = AuthDB.hash(AuthDB.genToken());
-            const token_doc = await instDB.token_col.findOne({_id : new ObjectId(token_hash)});
-            if (token_doc === null)
+            while ( true )
             {
-                await instDB.token_col.insertOne({_id : new ObjectId(token_hash), userID : userID});
-                return token_hash;
+                const token = AuthDB.genToken();
+                const tokenHash = AuthDB.hash(token);
+                const tokenDoc = await data.instDB!.token_col.findOne({_id : new ObjectId(tokenHash)});
+                if (tokenDoc === null)
+                {
+                    await data.instDB!.token_col.insertOne({_id : new ObjectId(tokenHash), userID : userID});
+                    return token;
+                }
             }
         }
     }

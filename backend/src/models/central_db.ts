@@ -1,6 +1,25 @@
 import { Db, Collection, Document, MongoClient, ObjectId} from 'mongodb';
 import { MONGO_URL } from '../config'
-import { userType } from '../shared';
+import { debugEnum, userType } from '../shared';
+
+class UserTree {
+    public user : Document | null;
+    public col : Collection<Document> | null;
+    public instDB : Central | null;
+    public message : debugEnum;
+    constructor()
+    {
+        this.user = null;
+        this.col = null;
+        this.instDB = null;
+        this.message = debugEnum.INVALID_INST_ID;
+    }
+}
+
+export function isUserTree (obj : any) : obj is UserTree
+{
+    return obj.user !== undefined && obj.col !== undefined && obj.instDB !== undefined;
+}
 
 export class Central
 {
@@ -121,8 +140,30 @@ export class Central
         }
     }
 
-    public static async getUser (userID: string, col : Collection <Document>): Promise <Document | null>
+    public static async getUser (userID: string, type : userType, instID : string): Promise <UserTree>
     {
-        return await col.findOne({_id : new ObjectId(userID)});
+        let returnObj = new UserTree();
+        const instDB = await Central.getInstDB(instID);
+        if (instDB === null)
+        {
+            return returnObj;
+        }
+        returnObj.instDB = instDB;
+        const col = Central.getCol(type, instDB);
+        if (col === null)
+        {
+            returnObj.message = debugEnum.INVALID_USER_TYPE;
+            return returnObj;
+        }
+        returnObj.col = col;
+        const user = await col.findOne({_id : new ObjectId(userID)});
+        if (user === null)
+        {
+            returnObj.message = debugEnum.INVALID_USER_ID;
+            return returnObj;
+        }
+        returnObj.user = user;
+        returnObj.message = debugEnum.SUCCESS;
+        return returnObj;
     }
 }
