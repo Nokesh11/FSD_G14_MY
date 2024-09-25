@@ -56,7 +56,6 @@ export default function TicketTable() {
 
   // Media query to detect small screen
   const isSmallScreen = useMediaQuery("(max-width:730px)");
-  const isSmallScreenB = useMediaQuery("(max-width:970px)");
 
   // Handle tab change
   const handleTabChange = (index) => {
@@ -146,7 +145,7 @@ export default function TicketTable() {
   return (
     <div style={styles.card}>
       {/* New Ticket Button */}
-      {isSmallScreenB ? (
+      {isSmallScreen ? (
         // Use IconButton with plus icon for small screens
         <IconButton
           onClick={handleOpenDialog}
