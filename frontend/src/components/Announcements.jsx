@@ -1,7 +1,5 @@
 import React from "react";
-import {
-  useTable
-} from "react-table";
+import { useTable } from "react-table";
 import {
   Table,
   TableBody,
@@ -15,7 +13,6 @@ import {
 } from "@mui/material";
 import { Info } from "lucide-react";
 
-// Announcement data creation function
 function createAnnouncementData(text) {
   return { text };
 }
@@ -35,30 +32,34 @@ export default function AnnouncementsTable() {
     () => [
       {
         Header: "Announcements",
-        accessor: "text", // accessor is the "key" in the data
+        accessor: "text", 
       },
     ],
     []
   );
 
-  // Use the react-table hook
   const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
     columns,
     data: initialAnnouncements,
   });
 
   return (
-    <Box sx={{ width: "100%", height: "100%", position: "relative", backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)", border: "none" }}>
-      <TableContainer
-        component={Paper}
-        sx={{ overflowY: "auto", marginTop: 1 }}
-      >
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        position: "relative",
+        backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)",
+        border: "none",
+      }}
+    >
+      <TableContainer component={Paper} sx={{ overflowY: "auto", marginTop: 1 }}>
         <Table stickyHeader {...getTableProps()} aria-label="announcements table">
           <TableHead>
-            {headerGroups.map(headerGroup => (
-              <TableRow {...headerGroup.getHeaderGroupProps()}>
-                {headerGroup.headers.map(column => (
-                  <TableCell {...column.getHeaderProps()}>
+            {headerGroups.map((headerGroup, headerIndex) => (
+              <TableRow {...headerGroup.getHeaderGroupProps()} key={`header-group-${headerIndex}`}>
+                {headerGroup.headers.map((column, columnIndex) => (
+                  <TableCell {...column.getHeaderProps()} key={`column-${columnIndex}`}>
                     <Typography
                       variant="h6"
                       sx={{
@@ -69,7 +70,7 @@ export default function AnnouncementsTable() {
                       }}
                     >
                       <Info />
-                      {column.render('Header')}
+                      {column.render("Header")}
                     </Typography>
                   </TableCell>
                 ))}
@@ -77,13 +78,13 @@ export default function AnnouncementsTable() {
             ))}
           </TableHead>
           <TableBody {...getTableBodyProps()}>
-            {rows.map(row => {
+            {rows.map((row, rowIndex) => {
               prepareRow(row);
               return (
-                <TableRow {...row.getRowProps()}>
-                  {row.cells.map(cell => (
-                    <TableCell {...cell.getCellProps()}>
-                      {cell.render('Cell')}
+                <TableRow {...row.getRowProps()} key={`row-${rowIndex}`}>
+                  {row.cells.map((cell, cellIndex) => (
+                    <TableCell {...cell.getCellProps()} key={`cell-${cellIndex}`}>
+                      {cell.render("Cell")}
                     </TableCell>
                   ))}
                 </TableRow>

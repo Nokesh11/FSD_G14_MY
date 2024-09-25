@@ -1,10 +1,13 @@
 import React, { useContext } from "react";
 import SidebarItem from "./SidebarItem";
 import { student as StudentItems } from "../Constants/Student.js";
-import { sidebarContext } from "../pages/Student/StudentDashBoard.jsx";
+import { sidebarContext } from "../pages/Student/StudentLayout.jsx";
+import { useLocation } from "react-router-dom";
 
 function Sidebar() {
   const { expanded, isMobile } = useContext(sidebarContext);
+  const location = useLocation();
+  const currPage = location.pathname.split("/").pop();
   if (isMobile && !expanded) {
     return null;
   }
@@ -19,7 +22,7 @@ function Sidebar() {
               key={index}
               icon={item.icon}
               text={item.text}
-              active={item.active}
+              active={item.path === currPage}
               alert={item.alert}
             />
           ))}

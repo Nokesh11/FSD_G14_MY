@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
-import { sidebarContext } from "../pages/Student/StudentDashBoard";
+import { sidebarContext } from "../pages/Student/StudentLayout";
+import { useNavigate } from "react-router-dom";
 
 function SidebarItem({ icon, text, active, alert }) {
   const { expanded } = useContext(sidebarContext);
+  const navigate = useNavigate();
 
   return (
     <li
@@ -10,6 +12,7 @@ function SidebarItem({ icon, text, active, alert }) {
         ? "bg-gradient-to-tr bg-primary text-white"
         : "hover:bg-indigo-50 text-gray-600"
         }`}
+        onClick={()=>{navigate(`/student/${text.toLowerCase()}`)}}
     >
       <span className={`flex-shrink-0 ${expanded ? "text-lg" : "text-sm"}`}>
         {icon}
