@@ -1,7 +1,8 @@
 import React from 'react';
+import PDFViewer from '../../components/TimeTableViewer';
 
 function StudentTimetable() {
-  return <h1>Welcome to the StudentTimetable Page</h1>;
+  return (<div><PDFViewer /></div>);
 }
 
 export default StudentTimetable;
