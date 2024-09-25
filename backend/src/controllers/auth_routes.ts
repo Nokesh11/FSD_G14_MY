@@ -14,6 +14,8 @@ app.use(cookieSession({
   maxAge: COOKIE_MAX_AGE,
 }));
 
+// Replace with info-enum
+
 app.post('/verify-creds', async (req : Request, res : Response) => 
 {
     const { string: userID, string: password, userType: type, string: instID } = req.body;

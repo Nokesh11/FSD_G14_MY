@@ -9,7 +9,9 @@ export enum debugEnum
     SUCCESS, 
     POWER_DOES_NOT_EXIST,
     USER_ALREADY_EXISTS,
-    INVALID_TOKEN
+    INVALID_TOKEN,
+    INVALID_TICKET_ID,
+    INVALID_TICKET_STAGE
 };
 export enum powerType 
 {
