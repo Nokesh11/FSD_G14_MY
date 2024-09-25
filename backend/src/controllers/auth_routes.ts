@@ -23,6 +23,10 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
     if (result === debugEnum.SUCCESS)
     {
         req.session!.authenticated = true;
+        req.session!.type = type;
+        req.session!.instID = instID;
+        req.session!.userID = userID;
+        req.session!.powers = []f;
         return res.status(200).json({ message: 'Credentials verified successfully.' });
     }
     else 
@@ -39,17 +43,17 @@ app.post('/verify-token', async (req, res) =>
     if (result === debugEnum.SUCCESS) 
     {
         req.session!.authenticated = true;
-        res.status(200).json('Valid token');
+        res.status(200).json({'message':'Valid token'});
     } 
     else 
     {
         req.session!.authenticated = false;
-        res.status(401).send('Invalid token');
+        res.status(401).json({'message':'Invalid token'});
     }
 });
 
 app.get('/logout', (req, res) => 
 {
     req.session!.authenticated = false;
-    res.status(200).send('Logged out');
+    res.status(200).json({'message':'Logged out'});
 });
