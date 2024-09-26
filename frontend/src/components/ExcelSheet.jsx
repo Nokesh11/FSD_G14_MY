@@ -1,22 +1,113 @@
-import * as React from 'react';
-import { DataGrid } from '@mui/x-data-grid';
-import Button from '@mui/material/Button';
-import { useState, useCallback } from 'react';
-import { format, addDays } from 'date-fns';
-import axios from 'axios'; // Ensure axios is installed
+// import * as React from "react";
+// import { DataGrid } from "@mui/x-data-grid";
+// import Button from "@mui/material/Button";
+// import { useState, useCallback } from "react";
+// import { format, addDays } from "date-fns";
+
+// export default function BasicEditingGrid() {
+//   const [columns, setColumns] = useState(initialColumns);
+//   const [rows, setRows] = useState(initialRows);
+
+//   const addColumn = useCallback(() => {
+//     const newDate = format(addDays(new Date(), columns.length), "dd/MM/yyyy");
+
+//     const newColumn = {
+//       field: newDate,
+//       headerName: newDate,
+//       width: 180,
+//       editable: true, // Make sure this is set to true
+//     };
+
+//     setColumns((prevColumns) => [...prevColumns, newColumn]);
+
+//     // Update existing rows to include the new column with default values
+//     setRows((prevRows) =>
+//       prevRows.map((row) => ({
+//         ...row,
+//         [newDate]: "", // Default value for the new column
+//       }))
+//     );
+//   }, [columns.length]);
+
+//   // Function to handle cell click events
+//   const handleCellClick = (params) => {
+//     console.log(
+//       `Cell Clicked - Row ID: ${params.row.id}, Column Field: ${params.field}, Cell Value: ${params.value}`
+//     );
+//   };
+
+//   // Function to handle cell edit commits
+//   const handleCellEditCommit = (params) => {
+//     const newValue = params.value; // New value from the edit
+//     const rowId = params.row.id; // ID of the row being edited
+//     const columnField = params.field; // The field being edited
+
+//     // Find the old value before the edit
+//     const oldRow = rows.find((row) => row.id === rowId);
+//     const oldValue =
+//       oldRow[columnField] !== undefined ? oldRow[columnField] : "N/A"; // Old value or 'N/A' if not set
+
+//     // Default the new value to 0 if it is empty
+//     const displayedNewValue = newValue === "" ? 0 : newValue;
+
+//     // Log the relevant information
+//     console.log(`Editing Row ID: ${rowId}, Column: ${columnField}`);
+//     console.log(`Old Value: ${oldValue}, New Value: ${displayedNewValue}`);
+//   };
+
+//   return (
+//     <div style={{ height: 300, width: "100%" }}>
+//       <Button
+//         variant="contained"
+//         onClick={addColumn}
+//         style={{ marginBottom: 16 }}
+//       >
+//         Add New Column (Date)
+//       </Button>
+//       <DataGrid
+//         rows={rows}
+//         columns={columns}
+//         onCellClick={handleCellClick} // Attach the click handler
+//         onCellEditStop={(params, event) => {
+// 			console.log(params);
+// 			handleCellEditCommit(params);
+//         }}
+//       />
+//     </div>
+//   );
+// }
+
+// // Initial column definitions
+// const initialColumns = [
+//   { field: "name", headerName: "Name", width: 180, editable: false }, // Only the name column
+// ];
+
+// // Initial row data with hardcoded names
+// const initialRows = [
+//   { id: 1, name: "Jon Snow" },
+//   { id: 2, name: "Arya Stark" },
+//   { id: 3, name: "Tyrion Lannister" },
+// ];
+
+
+import * as React from "react";
+import { DataGrid } from "@mui/x-data-grid";
+import Button from "@mui/material/Button";
+import { useState, useCallback } from "react";
+import { format, addDays } from "date-fns";
 
 export default function BasicEditingGrid() {
   const [columns, setColumns] = useState(initialColumns);
   const [rows, setRows] = useState(initialRows);
 
   const addColumn = useCallback(() => {
-    const newDate = format(addDays(new Date(), columns.length), 'dd/MM/yyyy');
+    const newDate = format(addDays(new Date(), columns.length), "dd/MM/yyyy");
 
     const newColumn = {
       field: newDate,
       headerName: newDate,
       width: 180,
-      editable: true,
+      editable: true, // Make sure this is set to true
     };
 
     setColumns((prevColumns) => [...prevColumns, newColumn]);
@@ -25,76 +116,63 @@ export default function BasicEditingGrid() {
     setRows((prevRows) =>
       prevRows.map((row) => ({
         ...row,
-        [newDate]: '', // Default value for the new column
+        [newDate]: "", // Default value for the new column
       }))
     );
   }, [columns.length]);
 
+  // Function to handle cell click events
+  const handleCellClick = (params) => {
+    console.log(
+      `Cell Clicked - Row ID: ${params.row.id}, Column Field: ${params.field}, Cell Value: ${params.value}`
+    );
+  };
+
   // Function to handle cell edit commits
-  const handleCellEditCommit = async (params) => {
-	console.log(params);
-    const studentName = params.row.name; // Get student name
-    const date = params.field; // Get the date (column field)
-    const newValue = params.value; // Get the new value
+  const handleCellEditCommit = (updatedRow) => {
+    const rowId = updatedRow.id; // ID of the row being edited
 
-    console.log(`Student Name: ${studentName}, Date: ${date}, New Value: ${newValue}`);
-
-    // Example request to backend
-    try {
-      await axios.post('/api/update', {
-        studentName,
-        date,
-        newValue,
-      });
-      console.log('Data sent to the backend successfully');
-    } catch (error) {
-      console.error('Error sending data to the backend:', error);
+    // Ensure the updatedRow contains the necessary structure
+    if (!rowId) {
+      console.error("Row ID is undefined. Cannot update row.");
+      return; // Exit if row ID is not present
     }
+
+    // Update the rows state with the new value
+    setRows((prevRows) =>
+      prevRows.map((row) => {
+        if (row.id === rowId) {
+          return { ...row, ...updatedRow }; // Update the edited row
+        }
+        return row; // Return unchanged rows
+      })
+    );
+
+    // Log the relevant information
+    console.log(`Editing Row ID: ${rowId}`);
+    console.log(`Updated Row Data:`, updatedRow);
+  };
+
+  // Handle errors during row updates
+  const handleProcessRowUpdateError = (e) => {
+    console.error("Error updating row:", e);
   };
 
   return (
-    <div style={{ height: 400, width: '100%', padding: '16px', backgroundColor: '#ffffff' }}>
+    <div style={{ height: 300, width: "100%" }}>
       <Button
         variant="contained"
         onClick={addColumn}
-        style={{ marginBottom: 16, backgroundColor: '#1976d2', color: '#ffffff' }}
+        style={{ marginBottom: 16 }}
       >
         Add New Column (Date)
       </Button>
       <DataGrid
         rows={rows}
         columns={columns}
-        onCellEditCommit={handleCellEditCommit} // Attach the edit commit handler
-        sx={{
-          '& .MuiDataGrid-root': {
-            border: '1px solid #e0e0e0',
-            borderRadius: '4px',
-          },
-          '& .MuiDataGrid-columnHeaders': {
-            backgroundColor: '#1976d2',
-            color: '#000000',
-            fontWeight: 'bold',
-            borderBottom: '2px solid #e0e0e0',
-          },
-          '& .MuiDataGrid-cell': {
-            borderBottom: '1px solid #e0e0e0',
-            padding: '8px',
-            color: '#333333',
-          },
-          '& .MuiDataGrid-row:nth-of-type(odd)': {
-            backgroundColor: '#f9f9f9',
-          },
-          '& .MuiDataGrid-row:nth-of-type(even)': {
-            backgroundColor: '#ffffff',
-          },
-          '& .MuiDataGrid-row:hover': {
-            backgroundColor: '#e0f7fa',
-          },
-          '& .MuiDataGrid-footerContainer': {
-            borderTop: '2px solid #e0e0e0',
-            backgroundColor: '#f1f1f1',
-          },
-        }}
+        onCellClick={handleCellClick} // Attach the click handler
+        processRowUpdate={handleCellEditCommit} // Handle row updates
+        onProcessRowUpdateError={handleProcessRowUpdateError} // Handle errors
       />
     </div>
   );
@@ -102,12 +180,13 @@ export default function BasicEditingGrid() {
 
 // Initial column definitions
 const initialColumns = [
-  { field: 'name', headerName: 'Name', width: 180, editable: false },
+  { field: "name", headerName: "Name", width: 180, editable: false }, // Only the name column
 ];
 
 // Initial row data with hardcoded names
 const initialRows = [
-  { id: 1, name: 'Jon Snow' },
-  { id: 2, name: 'Arya Stark' },
-  { id: 3, name: 'Tyrion Lannister' },
+  { id: 1, name: "Jon Snow" },
+  { id: 2, name: "Arya Stark" },
+  { id: 3, name: "Tyrion Lannister" },
 ];
+	
