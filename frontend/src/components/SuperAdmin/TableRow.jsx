@@ -2,6 +2,7 @@ import React from "react";
 import Button from "./Button";
 import { Plus, Pencil } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const TableRow = ({ sectionName }) => {
   const navigate = useNavigate();
@@ -9,7 +10,7 @@ const TableRow = ({ sectionName }) => {
   return (
     <tr className="hover:bg-gray-50">
       <td className="py-2 px-6 border-b border-gray-200 leading-tight text-center">
-        {sectionName}
+        <Link to="/admin/users">{sectionName}</Link>
       </td>
       <td className="py-2 px-6 border-b border-gray-200 text-center leading-tight">
         <div className="flex justify-center space-x-3">
