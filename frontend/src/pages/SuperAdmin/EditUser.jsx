@@ -81,10 +81,9 @@ export default function EditUser() {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/admin/get-powers`,
         {
-          data: {
             userID: data.userId,
-            type: role,
-          },
+            type: data.role,
+          
         }
       );
       setUserPowers(response.data); // Set the fetched powers

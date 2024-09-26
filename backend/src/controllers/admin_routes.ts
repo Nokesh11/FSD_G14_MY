@@ -124,11 +124,14 @@ app.post('/remove-powers', async (req : Request, res : Response) =>
 
 app.post('/get-powers', async (req : Request, res : Response) => 
 {
-    if (req.session!.powers.include(powerType.VIEW_POWERS))
+    console.log(req.session!.powers);
+    if (req.session!.authenticated === true && req.session!.powers.includes(powerType.VIEW_POWERS))
     {
         const {userID, type} = req.body;
         const instID = req.session!.instID;
         const result = await Central.getUser(userID, type, instID);
+        console.log(result);
+        console.log(type, instID, userID);
         if (result.message !== debugEnum.SUCCESS)
         {
             return res.status(401).json({ message: result.message });

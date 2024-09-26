@@ -129,8 +129,6 @@ export class Central
     {
         const databasesList = await Central.mongoClient.db().admin().listDatabases();
 
-        console.log("INSTID", instID);
-        console.log(databasesList.databases);
         // For now do not use cache, just fetch the obj every single time..
         if (databasesList.databases.some(db => db.name === instID) == true )
         {
@@ -175,7 +173,6 @@ export class Central
         }
         else 
         {
-            console.log(userID);
             // let obj = new ObjectId(userID);
             // console.log(obj);
             const user = await data.col!.findOne({_id : userID} as Condition<ObjectId>);
