@@ -1,7 +1,8 @@
 import React from 'react';
+import PDFViewer from '../../components/AlmanacViewer';
 
 function StudentAlmanac() {
-  return <h1>Welcome to the StudentAlmanac Page</h1>;
+  return (<div><PDFViewer /></div>);
 }
 
 export default StudentAlmanac;

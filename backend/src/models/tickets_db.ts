@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import { userType} from '../shared';
 import { Central } from './central_db';
 import { debugEnum } from '../shared';
 
@@ -7,7 +6,7 @@ interface TicketInterface //InterfaceTicket
 {
     _id : ObjectId,
     fromID : string,
-    from_userType : userType,
+    from_userType : string,
     toID : string, 
     tag : string, 
     title : string,
@@ -18,7 +17,7 @@ interface TicketInterface //InterfaceTicket
 }
 
 export function Ticket (this : TicketInterface, fromID : string, 
-                        from_userType : userType, toID : string, 
+                        from_userType : string, toID : string, 
                         tag : string, title : string, 
                         body : string, stages : Array<string>, 
                         curStage : string, department : string )
@@ -97,7 +96,7 @@ export class TicketDB
                     resolvedTickets.push(ticketID);
                     const index = active_tickets.indexOf(ticketID);
                     active_tickets.splice(index, 1);
-                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
+                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID as string)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
                     return debugEnum.SUCCESS;
                 }
                 else 
@@ -119,7 +118,7 @@ export class TicketDB
         });
     }
 
-    public static async getActiveTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    public static async getActiveTicketIDs(userID : string, type : string, instID : string) : Promise<Array<String> | null>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -132,7 +131,7 @@ export class TicketDB
         }
     }
 
-    public static async getResolvedTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    public static async getResolvedTicketIDs(userID : string, type : string, instID : string) : Promise<Array<String> | null>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
