@@ -1,8 +1,9 @@
 import { Db, Collection, Document, MongoClient, ObjectId} from 'mongodb';
 import { MONGO_URL } from '../config'
-import { debugEnum, userType } from '../shared';
+import { debugEnum } from '../shared';
 
-class UserTree {
+export class UserTree 
+{
     public user : Document | null;
     public col : Collection<Document> | null;
     public instDB : Central | null;
@@ -16,6 +17,19 @@ class UserTree {
     }
 }
 
+export class ColTree 
+{
+    public col : Collection<Document> | null;
+    public instDB : Central | null;
+    public message : debugEnum;
+    constructor()
+    {
+        this.col = null;
+        this.instDB = null;
+        this.message = debugEnum.INVALID_INST_ID;
+    }
+}
+
 export function isUserTree (obj : any) : obj is UserTree
 {
     return obj.user !== undefined && obj.col !== undefined && obj.instDB !== undefined;
@@ -23,7 +37,7 @@ export function isUserTree (obj : any) : obj is UserTree
 
 export class Central
 {
-    private static mongoClient : MongoClient;
+    public static mongoClient : MongoClient;
     private db : Db;
     public student_col : Collection;
 /*
@@ -108,7 +122,7 @@ export class Central
     {
         Central.mongoClient =  new MongoClient(MONGO_URL);
         await Central.mongoClient.connect();
-        console.log("DB ")
+        console.log("DB connected");
     }
 
     public static async getInstDB(instID : string) : Promise<Central | null>
@@ -126,44 +140,75 @@ export class Central
         }
     }
     
-    // Reutrns null if the user type is invalid, else returns the collection
-    public static getCol(type : userType, instDB : Central) : Collection<Document> | null 
+    public static async getCol(instID : string, colName : string) : Promise<ColTree>
     {
-        switch (type)
-        {
-            case userType.STUDENT:
-                return instDB.student_col;
-            case userType.ADMIN:
-                return instDB.admin_col
-            default:
-                return null;
-        }
-    }
-
-    public static async getUser (userID: string, type : userType, instID : string): Promise <UserTree>
-    {
-        let returnObj = new UserTree();
+        let returnObj= new ColTree();
         const instDB = await Central.getInstDB(instID);
         if (instDB === null)
         {
             return returnObj;
         }
         returnObj.instDB = instDB;
-        const col = Central.getCol(type, instDB);
-        if (col === null)
+        const colList = await instDB.db.listCollections().toArray();
+        if (colList.some(col => col.name === colName) == true)
         {
-            returnObj.message = debugEnum.INVALID_USER_TYPE;
+            returnObj.col = instDB.db.collection(colName);
+            returnObj.message = debugEnum.SUCCESS;
             return returnObj;
         }
-        returnObj.col = col;
-        const user = await col.findOne({_id : new ObjectId(userID)});
-        if (user === null)
-        {
-            returnObj.message = debugEnum.INVALID_USER_ID;
-            return returnObj;
-        }
-        returnObj.user = user;
-        returnObj.message = debugEnum.SUCCESS;
+        returnObj.message = debugEnum.COL_DOES_NOT_EXIST;
         return returnObj;
+    }
+
+    public static async getUser (userID: string, userType : string, instID : string): Promise <UserTree>
+    {
+        let returnObj = new UserTree();
+        const data = await Central.getCol(instID, userType);
+        returnObj.message = data.message;
+        returnObj.instDB = data.instDB;
+        returnObj.col = data.col;
+        if (data.message !== debugEnum.SUCCESS)
+        {
+            return returnObj;
+        }
+        else 
+        {
+            const user = await data.col!.findOne({_id : new ObjectId(userID)});
+            if (user === null)
+            {
+                returnObj.message = debugEnum.INVALID_USER_ID;
+                return returnObj;
+            }
+            returnObj.user = user;
+            returnObj.message = debugEnum.SUCCESS;
+            return returnObj;
+        }
+    }
+
+    public static async createInst (instID : string) : Promise<debugEnum>
+    {
+        const databasesList = await Central.mongoClient.db().admin().listDatabases();
+        if (databasesList.databases.some(db => db.name === instID) == true )
+        {
+            // Create db in mongo 
+            const db = Central.mongoClient.db(instID);
+            await Promise.all([
+                db.createCollection('student'),
+                db.createCollection('admin'),
+                db.createCollection('ticket'),
+                db.createCollection('token'),
+                db.createCollection('config'),
+                db.createCollection('cluster'),
+                db.createCollection('courses')
+            ]);
+                        // Create the index for the 'token' collection
+            const token_col = db.collection('token'); // Get the token collection reference
+            await token_col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 3600 * 24 });
+            return debugEnum.SUCCESS;
+        }
+        else 
+        {
+            return debugEnum.INST_ID_ALREADY_EXISTS;
+        }
     }
 }
