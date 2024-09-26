@@ -199,7 +199,7 @@ export default function EditUser() {
                 render={({ field }) => (
                   <select {...field} className="border p-2 rounded w-full">
                     <option value="">Select a power</option>
-                    {allPowers
+                    {allPowers && allPowers
                       .filter(
                         (power) => !userPowers.some((p) => p.id === power.id)
                       ) // Filter out already assigned powers
@@ -230,7 +230,7 @@ export default function EditUser() {
           <div className="mt-6">
             <h2 className="font-bold">Assigned Powers</h2>
             <ul className="space-y-2 mt-2">
-              {userPowers.map((power) => (
+              {userPowers && userPowers.map((power) => (
                 <li
                   key={power.id}
                   className="flex justify-between items-center"
