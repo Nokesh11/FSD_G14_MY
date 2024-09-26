@@ -1,25 +1,56 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const AdminLogin = () => {
   const [institute_ID, setInstitute_ID] = useState("");
-  const [userID, setUserID] = useState(""); // New state for UserID
+  const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
+      const userID = localStorage.getItem("userID");
+      const instID = localStorage.getItem("instID");
+
+      if (token && userID && instID) {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_BASE_URL}/auth/verify-token`,
+            {
+              token,
+              userID,
+              instID,
+              userType: "admin",
+            }
+          );
+          if (response.status === 200) {
+            navigate("/admin/dashboard");
+          }else{
+            navigate("/admin/login");
+          }
+        } catch (error) {
+            console.error("Token verification failed", error);
+        }
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
+
   const validateForm = () => {
     const newErrors = {};
     const trimmedInstitute_ID = institute_ID.trim();
-    const trimmedUserID = userID.trim(); // Trimming UserID value
+    const trimmedUserID = userID.trim();
     const trimmedPassword = password.trim();
 
     if (!trimmedInstitute_ID) {
       newErrors.institute_ID = "Institute ID is required.";
     }
     if (!trimmedUserID) {
-      newErrors.userID = "User ID is required."; // Validation for UserID
+      newErrors.userID = "User ID is required.";
     }
     if (!trimmedPassword) {
       newErrors.password = "Password is required.";
@@ -33,27 +64,27 @@ const AdminLogin = () => {
     e.preventDefault();
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length === 0) {
-      alert(
-        `Form submitted successfully! 
-                \nInstitute ID: ${institute_ID} 
-                \nUser ID: ${userID} 
-                \nPassword: ${password}`
-      );
       const formattedData = {
-        userID: userID,
-        password: password,
+        userID,
+        password,
         type: "admin",
         instID: institute_ID,
       };
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/auth/verify-creds`,
-        formattedData
-      );
-      if (response.status === 200) {
-        localStorage.setItem("token", response.data.token); 
-        localStorage.setItem("role", "superadmin"); 
-        navigate("/admin/dashboard");
+      try {
+        const response = await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/auth/verify-creds`,
+          formattedData
+        );
+        if (response.status === 200) {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("role", "superadmin");
+          localStorage.setItem("userID", userID);
+          localStorage.setItem("instID", institute_ID);
+          navigate("/admin/dashboard");
+        }
+      } catch (error) {
+        console.error("Login failed", error);
       }
     } else {
       setErrors(validationErrors);
@@ -97,7 +128,7 @@ const AdminLogin = () => {
 
         {/* User ID */}
         <label className="mb-2 text-gray-700 font-medium">
-          User ID {/* New label for User ID */}
+          User ID
           <input
             type="text"
             value={userID}
