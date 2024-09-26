@@ -6,7 +6,7 @@ function AddUserCurr() {
   // State to store form input values
   const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
-  const [userType, setUserType] = useState("");
+  const [type, setUserType] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState(null); // State for the uploaded file
 
@@ -21,7 +21,7 @@ function AddUserCurr() {
         {
           userID,
           password,
-          userType,
+          type,
         }
       );
       setMessage(response.data.message); // Success message
@@ -121,7 +121,7 @@ function AddUserCurr() {
           <input
             type="text"
             id="userType"
-            value={userType}
+            value={type}
             onChange={(e) => setUserType(e.target.value)}
             required
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
