@@ -1,12 +1,33 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import axios from "axios";
 
+// Enum for power types
+const powerType = {
+  CREATE_USER: "CREATE_USER",
+  DELETE_USER: "DELETE_USER",
+  CHANGE_PASSWORD: "CHANGE_PASSWORD",
+  EDIT_POWERS: "EDIT_POWERS",
+  VIEW_POWERS: "VIEW_POWERS",
+  ALL_COURSES_ACCESS: "ALL_COURSES_ACCESS",
+  EDIT_ATTENDANCE: "EDIT_ATTENDANCE",
+  ADD_QUIZ: "ADD_QUIZ",
+  ADD_EXAM: "ADD_EXAM",
+  ADD_ASSIGNMENT: "ADD_ASSIGNMENT",
+  EDIT_QUIZ_SCORES: "EDIT_QUIZ_SCORES",
+  EDIT_ASSIGNMENT_SCORES: "EDIT_ASSIGNMENT_SCORES",
+  EDIT_EXAM_SCORES: "EDIT_EXAM_SCORES",
+  EDIT_CLUSTERS: "EDIT_CLUSTERS",
+  EDIT_STUDENT_COURSES: "EDIT_STUDENT_COURSES",
+  EDIT_FACULTY_COURSES: "EDIT_FACULTY_COURSES",
+};
+
 // Validation schema for User ID input
 const userIdSchema = Yup.object().shape({
   userId: Yup.string().required("User ID is required"),
+  role: Yup.string().required("Role is required"),
 });
 
 // Validation schema for power assignment
@@ -15,12 +36,18 @@ const powerSchema = Yup.object().shape({
 });
 
 export default function EditUser() {
-  const [allPowers, setAllPowers] = useState([]); // List of all available powers
   const [userPowers, setUserPowers] = useState([]); // Powers already assigned to the user
   const [userId, setUserId] = useState(""); // User ID input
+  const [role, setRole] = useState(""); // Role input
   const [fetchComplete, setFetchComplete] = useState(false); // To control the power form rendering
 
-  // User ID Form
+  // List of all available powers from the powerType enum
+  const allPowers = Object.keys(powerType).map((key) => ({
+    id: key,
+    name: powerType[key],
+  }));
+
+  // User ID and Role Form
   const {
     control: userIdControl,
     handleSubmit: handleUserIdSubmit,
@@ -29,6 +56,7 @@ export default function EditUser() {
     resolver: yupResolver(userIdSchema),
     defaultValues: {
       userId: "",
+      role: "",
     },
   });
 
@@ -44,16 +72,22 @@ export default function EditUser() {
     },
   });
 
-  // Fetch available and user-assigned powers after User ID submission
+  // Fetch user-assigned powers after User ID and Role submission
   const fetchPowers = async (data) => {
+    console.log(data);
     setUserId(data.userId);
+    setRole(data.role);
     try {
-      const { data: availablePowers } = await axios.get("/api/powers");
-      const { data: userAssignedPowers } = await axios.get(
-        `/api/users/${data.userId}/powers`
+      const response = await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/admin/get-powers`,
+        {
+          data: {
+            userID: data.userId,
+            type: role,
+          },
+        }
       );
-      setAllPowers(availablePowers);
-      setUserPowers(userAssignedPowers);
+      setUserPowers(response.data); // Set the fetched powers
       setFetchComplete(true); // Allows the power form to be displayed
     } catch (error) {
       console.error("Error fetching powers: ", error);
@@ -64,11 +98,14 @@ export default function EditUser() {
   const onAssignPower = async (data) => {
     try {
       const response = await axios.post(
-        `/api/users/${userId}/assign-power`,
-        data
+        `${process.env.REACT_APP_BASE_URL}/admin/give-powers`,
+        { userID: userId, type: role, power: data.power } // Pass the selected power ID
       );
       console.log("Power assigned successfully:", response.data);
-      setUserPowers((prev) => [...prev, response.data.power]);
+      setUserPowers((prev) => [
+        ...prev,
+        { id: data.power, name: powerType[data.power] },
+      ]);
     } catch (error) {
       console.error("Error assigning power: ", error);
     }
@@ -77,7 +114,14 @@ export default function EditUser() {
   // Handle removing power
   const handleRemovePower = async (powerId) => {
     try {
-      await axios.post(`/api/users/${userId}/remove-power`, { powerId });
+      await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/admin/remove-powers`,
+        {
+          userID: userId,
+          type: role,
+          power: powerId,
+        }
+      );
       console.log("Power removed successfully");
       setUserPowers((prev) => prev.filter((power) => power.id !== powerId)); // Update the assigned powers list
     } catch (error) {
@@ -87,7 +131,7 @@ export default function EditUser() {
 
   return (
     <div className="max-w-md mx-auto p-6 border border-gray-300 rounded-lg shadow-md bg-white">
-      {/* Step 1: User ID Submission Form */}
+      {/* Step 1: User ID and Role Submission Form */}
       {!fetchComplete && (
         <form
           onSubmit={handleUserIdSubmit(fetchPowers)}
@@ -108,6 +152,24 @@ export default function EditUser() {
             />
             {userIdErrors.userId && (
               <p className="text-red-500">{userIdErrors.userId.message}</p>
+            )}
+          </div>
+
+          <div>
+            <label>Role</label>
+            <Controller
+              control={userIdControl}
+              name="role"
+              render={({ field }) => (
+                <input
+                  {...field}
+                  placeholder="Enter User Role"
+                  className="border p-2 rounded w-full"
+                />
+              )}
+            />
+            {userIdErrors.role && (
+              <p className="text-red-500">{userIdErrors.role.message}</p>
             )}
           </div>
 
