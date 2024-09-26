@@ -14,8 +14,8 @@ app.post('/create-user', async (req : Request, res : Response) =>
     console.log(req.session);
     if (req.session!.powers.includes(powerType.CREATE_USER))
     {
-        const { userID, password, type } = req.body;
         const instID = req.session!.instID;
+        const { userID, password, type } = req.body;
         const result = await AdminDB.createUser(userID, password, type, instID);
         if (result === debugEnum.SUCCESS)
         {
@@ -37,7 +37,8 @@ app.post('/delete-user', async (req : Request, res : Response) =>
 {
     if (req.session!.powers.includes(powerType.DELETE_USER))
     {
-        const { string: userID, userType: type, string: instID } = req.body;
+        const instID = req.session!.instID;
+        const { userID, type } = req.body;
         const result = await AdminDB.deleteUser(userID, type, instID);
         if (result === debugEnum.SUCCESS)
         {
@@ -58,7 +59,8 @@ app.post('/change-password', async (req : Request, res : Response) =>
 {
     if (req.session!.powers.includes(powerType.CHANGE_PASSWORD))
     {
-        const { string: userID, string: password, userType: type, string: instID } = req.body;
+        const instID = req.session!.instID;
+        const { userID, password, type } = req.body;
         const result = await AdminDB.changePassword(userID, password, type, instID);
         if (result === debugEnum.SUCCESS)
         {
@@ -79,8 +81,9 @@ app.post('/change-password', async (req : Request, res : Response) =>
 app.post('/give-powers', async (req : Request, res : Response) =>
 {
     if (req.session!.powers.includes(powerType.EDIT_POWERS))
-    {
-        const { string: userID, userType: type, string: instID, power: power } = req.body;
+    {   
+        const instID = req.session!.instID;
+        const { userID, type, power } = req.body;
         const result = await AdminDB.givePowers(userID, type, instID, power);
         if (result === debugEnum.SUCCESS)
         {
@@ -101,7 +104,8 @@ app.post('/remove-powers', async (req : Request, res : Response) =>
 {
     if (req.session!.powers.includes(powerType.EDIT_POWERS))
     {
-        const { string: userID, userType: type, string: instID, power: power } = req.body;
+        const instID = req.session!.instID;
+        const { userID, power, type } = req.body;
         const result = await AdminDB.removePowers(userID, type, instID, power);
         if (result === debugEnum.SUCCESS)
         {

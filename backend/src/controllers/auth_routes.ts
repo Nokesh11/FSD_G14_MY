@@ -1,11 +1,6 @@
-import express from 'express';
 import { Router } from 'express';
 import { AuthDB } from '../models/auth_db';
 import { debugEnum } from '../shared';
-import cookieSession from 'cookie-session';
-import { Request, Response } from 'express';
-import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS } from '../config';
-import cors from "cors";
 
 
 export const app = Router();
