@@ -17,8 +17,10 @@ import Users from "./pages/SuperAdmin/Users";
 import Error404 from "./pages/Error-404";
 import ExcelEditor from "./components/ExcelSheet";
 import FacultyDashboard from "./pages/Faculty/FacultyDashboard";
-import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import CoursesList from "./pages/Student/CoursesList";
+import CoursePage from "./pages/Student/CoursePage";
 
 function App() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -41,7 +43,8 @@ function App() {
           <Route path="docvault" element={<StudentDocVault />} />
           <Route path="timetable" element={<StudentTimetable />} />
           <Route path="almanac" element={<StudentAlmanac />} />
-          <Route path="scores" element={<StudentAlmanac />} />
+          <Route path="scores" element={<CoursesList />} />
+          <Route path="scores/:courseid" element={<CoursePage />} />
         </Route>
         <Route path="/faculty" element={<Layout />}>
           <Route path="dashboard" element={<FacultyDashboard />} />
