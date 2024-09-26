@@ -1,0 +1,96 @@
+/* src/stylesheets/courses.css */
+.list-container {
+    width: 100%;
+    margin: 20px auto;
+    /* font-family: Arial, sans-serif; */
+    max-height: 300px;
+    overflow-y: auto;
+    /* border: 1px solid #ddd; */
+    border-radius: 8px;
+}
+
+/* Scrollbar styling */
+.list-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.list-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.list-container::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+}
+
+.list-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#list-item {
+    display: flex;
+    flex: 1;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: #fff;
+    position: relative;
+    transition: background 0.2s ease-in-out;
+}
+
+.list-item:hover {
+    background: #f1f1f1;
+}
+
+.item-title {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.menu-icon {
+    cursor: pointer;
+    font-size: 22px;
+    user-select: none;
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 20px;
+    top: 45px;
+    background: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+    padding: 10px;
+    min-width: 100px;
+}
+
+.dropdown-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.dropdown-menu li {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+    transition: background 0.2s ease-in-out;
+}
+
+.dropdown-menu li:hover {
+    background: #007bff;
+    color: #fff;
+    border-radius: 4px;
+}
