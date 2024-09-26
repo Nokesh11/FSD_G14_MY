@@ -1,6 +1,6 @@
 import { Db, Collection, Document, MongoClient, ObjectId} from 'mongodb';
 import { MONGO_URL } from '../config'
-import { debugEnum, userType } from '../shared';
+import { debugEnum } from '../shared';
 
 export class UserTree 
 {
@@ -182,6 +182,33 @@ export class Central
             returnObj.user = user;
             returnObj.message = debugEnum.SUCCESS;
             return returnObj;
+        }
+    }
+
+    public static async createInst (instID : string) : Promise<debugEnum>
+    {
+        const databasesList = await Central.mongoClient.db().admin().listDatabases();
+        if (databasesList.databases.some(db => db.name === instID) == true )
+        {
+            // Create db in mongo 
+            const db = Central.mongoClient.db(instID);
+            await Promise.all([
+                db.createCollection('student'),
+                db.createCollection('admin'),
+                db.createCollection('ticket'),
+                db.createCollection('token'),
+                db.createCollection('config'),
+                db.createCollection('cluster'),
+                db.createCollection('courses')
+            ]);
+                        // Create the index for the 'token' collection
+            const token_col = db.collection('token'); // Get the token collection reference
+            await token_col.createIndex({ "createdAt": 1 }, { expireAfterSeconds: 3600 * 24 });
+            return debugEnum.SUCCESS;
+        }
+        else 
+        {
+            return debugEnum.INST_ID_ALREADY_EXISTS;
         }
     }
 }

@@ -1,4 +1,3 @@
-import { userType } from '../shared';
 import { ObjectId } from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum, powerType } from '../shared';

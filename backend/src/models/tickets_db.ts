@@ -1,5 +1,4 @@
 import { ObjectId } from 'mongodb';
-import { userType} from '../shared';
 import { Central } from './central_db';
 import { debugEnum } from '../shared';
 
@@ -97,7 +96,7 @@ export class TicketDB
                     resolvedTickets.push(ticketID);
                     const index = active_tickets.indexOf(ticketID);
                     active_tickets.splice(index, 1);
-                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
+                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID as string)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
                     return debugEnum.SUCCESS;
                 }
                 else 

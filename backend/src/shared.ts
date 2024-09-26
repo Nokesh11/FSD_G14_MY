@@ -1,5 +1,5 @@
-export const enum userType {STUDENT, ADMIN};
 export const enum ticketStatus {RESOLVED, PENDING};
+
 export enum debugEnum 
 {
     INVALID_CREDENTIALS, 
@@ -18,6 +18,7 @@ export enum debugEnum
     ASSIGNMENT_DOES_NOT_EXIST,
     EXAM_ALREADY_EXISTS,
     EXAM_DOES_NOT_EXIST,
+    INST_ID_ALREADY_EXISTS
 };
 
 // Have to implemnt course clusters.
@@ -36,7 +37,15 @@ export enum powerType
     EDIT_CLUSTERS,
     EDIT_STUDENT_COURSES,
     EDIT_FACULTY_COURSES,
-    EDIT_COURSES,
 };
 export const student_type = "student";
 export const admin_type = "admin";
+
+
+/* Generally 
+
+Faculty / teaching staff (professors and teaching assistants) : EDIT_ATTENDANCE, EDIT_QUIZ_SCORES, EDIT_ASSIGNMENT_SCORES, EDIT_EXAM_SCORES, 
+Students : VIEW_ATTENDANCE, VIEW_QUIZ_SCORES, VIEW_ASSIGNMENT_SCORES, VIEW_EXAM_SCORES, RESOLVE_TICKETS
+Admins : Flexible.. all staff powers + EDIT_STUDENT_COURSES, EDIT_FACULTY_COURSES, EDIT_CLUSTERS, RESOLVE_TICKETS
+
+*/

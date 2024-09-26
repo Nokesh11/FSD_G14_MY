@@ -1,6 +1,6 @@
-import { ObjectId, Collection, PushOperator, PullOperator} from 'mongodb';
+import { ObjectId, PushOperator, PullOperator} from 'mongodb';
 import { Central } from './central_db';
-import { admin_type, debugEnum, student_type } from '../shared';
+import { admin_type, debugEnum } from '../shared';
 import { UserTree, ColTree } from './central_db';
 
 const COURSE_HEADER_ID = "__MAIN__";

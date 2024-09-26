@@ -20,15 +20,18 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
 {
     const { string: userID, string: password, userType: type, string: instID } = req.body;
     const result = await AuthDB.verifyCreds(userID, password, type, instID);
-    if (result === debugEnum.SUCCESS)
+    if (result.message === debugEnum.SUCCESS)
     {
         req.session!.authenticated = true;
         req.session!.type = type;
         req.session!.instID = instID;
         req.session!.userID = userID;
-        // Have to add the powers here ...
-        req.session!.powers = [];
-        return res.status(200).json({ message: 'Credentials verified successfully.' });
+        req.session!.powers = result.powers;
+        return res.status(200).json({ 
+                                    message: 'Credentials verified successfully.' , 
+                                    token : result.token, 
+                                    powers : result.powers 
+                                });
     }
     else 
     {
@@ -41,15 +44,17 @@ app.post('/verify-token', async (req, res) =>
 {
     const { string: userID, string: token, userType: type, string: instID } = req.body;
     const result = await AuthDB.verifyToken(userID, token, type, instID);
-    if (result === debugEnum.SUCCESS) 
+    if (result.message === debugEnum.SUCCESS) 
     {
         req.session!.authenticated = true;
         req.session!.type = type;
         req.session!.instID = instID;
         req.session!.userID = userID;
-        // Have to add the powers here ...
-        req.session!.powers = [];
-        res.status(200).json({'message':'Valid token'});
+        req.session!.powers = result.powers;
+        res.status(200).json({
+                                message:'Valid token',
+                                powers : result.powers
+                            });
     } 
     else 
     {
