@@ -41,9 +41,9 @@ export default function EditUser() {
   const [role, setRole] = useState(""); // Role input
   const [fetchComplete, setFetchComplete] = useState(false); // To control the power form rendering
 
-  // List of all available powers from the powerType enum
-  const allPowers = Object.keys(powerType).map((key) => ({
-    id: key,
+  // List of all available powers from the powerType enum with their indexes
+  const allPowers = Object.keys(powerType).map((key, index) => ({
+    id: index, // Use index as the id
     name: powerType[key],
   }));
 
@@ -81,12 +81,11 @@ export default function EditUser() {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/admin/get-powers`,
         {
-            userID: data.userId,
-            type: data.role,
-          
+          userID: data.userId,
+          type: data.role,
         }
       );
-      if(Array.isArray(response.data))
+      if (Array.isArray(response.data))
         setUserPowers(response.data); // Set the fetched powers
       setFetchComplete(true); // Allows the power form to be displayed
     } catch (error) {
@@ -96,15 +95,16 @@ export default function EditUser() {
 
   // Handle power assignment
   const onAssignPower = async (data) => {
+    const powerIndex = parseInt(data.power); // Get the index from the selected value
     try {
       const response = await axios.post(
         `${process.env.REACT_APP_BASE_URL}/admin/give-powers`,
-        { userID: userId, type: role, power: data.power } // Pass the selected power ID
+        { userID: userId, type: role, power: powerIndex } 
       );
       console.log("Power assigned successfully:", response.data);
       setUserPowers((prev) => [
         ...prev,
-        { id: data.power, name: powerType[data.power] },
+        { id: powerIndex, name: powerType[Object.keys(powerType)[powerIndex]] }, // Get the name from the powerType using the index
       ]);
     } catch (error) {
       console.error("Error assigning power: ", error);
@@ -119,7 +119,7 @@ export default function EditUser() {
         {
           userID: userId,
           type: role,
-          power: powerId,
+          power: powerId, 
         }
       );
       console.log("Power removed successfully");
