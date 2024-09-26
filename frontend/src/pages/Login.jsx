@@ -56,13 +56,12 @@ export default function LoginForm() {
         userType: role,
         instID: data.instituteId
       }
+      console.log(formattedData);
       const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/verify-creds`, formattedData);
       if(response.status === 200){
         localStorage.setItem('token', response.data.data.token);
         const userRole = response.data.data.role;
         localStorage.setItem('role', userRole);
-        if(role === "hostel-admin") navigate("/hostel/dashboard");
-        if(role === "academic-admin") navigate("/academic/dashboard");
         if(role === "faculty") navigate("/faculty/dashboard");
         if(role === "student") navigate("/student/dashboard");
       }else{
