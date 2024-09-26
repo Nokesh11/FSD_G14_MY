@@ -16,6 +16,9 @@ import AddUserCurr from "./pages/SuperAdmin/AddUserCurr";
 import Users from "./pages/SuperAdmin/Users";
 import Error404 from "./pages/Error-404";
 import ExcelEditor from "./components/ExcelSheet";
+import FacultyDashboard from "./pages/Faculty/FacultyDashboard";
+import "slick-carousel/slick/slick.css"; 
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -40,14 +43,15 @@ function App() {
           <Route path="almanac" element={<StudentAlmanac />} />
         </Route>
         <Route path="/faculty" element={<Layout />}>
+          <Route path="dashboard" element={<FacultyDashboard />} />
           <Route path="attendance" element={<ExcelEditor />} />
         </Route>
         <Route path="/test" element={<Error404 />} />
         <Route path="/admin" element={<AdminLayout />}>
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="users" element={<Users />} />
-          <Route path="users/add" element={<AddUserCurr /> } /> 
-          <Route path="users/edit" element={<EditUser /> } /> 
+          <Route path="users/add" element={<AddUserCurr />} />
+          <Route path="users/edit" element={<EditUser />} />
         </Route>
       </Routes>
     </Router>
