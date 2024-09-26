@@ -9,30 +9,21 @@ import { debugEnum } from '../shared';
 export class AuthDB 
 {
  
-    public static async verifyCreds (userID: string, password: string, type: userType, instID: string): Promise<any>
+    public static async verifyCreds (userID: string, password: string, type: string, instID: string): Promise<debugEnum>
     {
-        const instDB = await Central.getInstDB(instID);
-
-        if (instDB === null)
+        const data = await Central.getCol(type, instID);
+        if (data.message !== debugEnum.SUCCESS)
         {
-            return null;
+            return data.message;
         }
-
-        const col = Central.getCol(type, instDB);
-    
-        if (col === null)
-        {
-            return null;
-        }
+        const col = data.col;
         const passHash = AuthDB.hash(password);
-        const user = await col.findOne({_id : new ObjectId(userID), passHash : passHash}); 
+        const user = await col!.findOne({_id : new ObjectId(userID), passHash : passHash}); 
 
         if (user === null)
         {
-            return null;
+            return debugEnum.INVALID_CREDENTIALS;
         }
-
-        
         return debugEnum.SUCCESS;
     };
 
@@ -62,7 +53,7 @@ export class AuthDB
     }
 
     // Have to set expiry for the token here ...
-    public static async setToken (userID : string, type : userType, instID : string): Promise<string | debugEnum>
+    public static async setToken (userID : string, type : string, instID : string): Promise<string | debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)

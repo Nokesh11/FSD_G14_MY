@@ -26,7 +26,8 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
         req.session!.type = type;
         req.session!.instID = instID;
         req.session!.userID = userID;
-        req.session!.powers = []f;
+        // Have to add the powers here ...
+        req.session!.powers = [];
         return res.status(200).json({ message: 'Credentials verified successfully.' });
     }
     else 
@@ -43,6 +44,11 @@ app.post('/verify-token', async (req, res) =>
     if (result === debugEnum.SUCCESS) 
     {
         req.session!.authenticated = true;
+        req.session!.type = type;
+        req.session!.instID = instID;
+        req.session!.userID = userID;
+        // Have to add the powers here ...
+        req.session!.powers = [];
         res.status(200).json({'message':'Valid token'});
     } 
     else 

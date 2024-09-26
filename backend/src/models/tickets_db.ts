@@ -7,7 +7,7 @@ interface TicketInterface //InterfaceTicket
 {
     _id : ObjectId,
     fromID : string,
-    from_userType : userType,
+    from_userType : string,
     toID : string, 
     tag : string, 
     title : string,
@@ -18,7 +18,7 @@ interface TicketInterface //InterfaceTicket
 }
 
 export function Ticket (this : TicketInterface, fromID : string, 
-                        from_userType : userType, toID : string, 
+                        from_userType : string, toID : string, 
                         tag : string, title : string, 
                         body : string, stages : Array<string>, 
                         curStage : string, department : string )
@@ -119,7 +119,7 @@ export class TicketDB
         });
     }
 
-    public static async getActiveTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    public static async getActiveTicketIDs(userID : string, type : string, instID : string) : Promise<Array<String> | null>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -132,7 +132,7 @@ export class TicketDB
         }
     }
 
-    public static async getResolvedTicketIDs(userID : string, type : userType, instID : string) : Promise<Array<String> | null>
+    public static async getResolvedTicketIDs(userID : string, type : string, instID : string) : Promise<Array<String> | null>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
