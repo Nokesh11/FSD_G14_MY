@@ -86,7 +86,8 @@ export default function EditUser() {
           
         }
       );
-      setUserPowers(response.data); // Set the fetched powers
+      if(Array.isArray(response.data))
+        setUserPowers(response.data); // Set the fetched powers
       setFetchComplete(true); // Allows the power form to be displayed
     } catch (error) {
       console.error("Error fetching powers: ", error);

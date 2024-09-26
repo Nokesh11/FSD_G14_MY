@@ -1,9 +1,6 @@
-import express from 'express';
 import { Router } from 'express';
 import { debugEnum, powerType } from '../shared';
-import cookieSession from 'cookie-session';
 import { Request, Response } from 'express';
-import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS } from '../config';
 import { AdminDB } from '../models/admin_db';
 import { Central } from '../models/central_db';
 
@@ -130,12 +127,11 @@ app.post('/get-powers', async (req : Request, res : Response) =>
         const {userID, type} = req.body;
         const instID = req.session!.instID;
         const result = await Central.getUser(userID, type, instID);
-        console.log(result);
-        console.log(type, instID, userID);
         if (result.message !== debugEnum.SUCCESS)
         {
             return res.status(401).json({ message: result.message });
         }
+        console.log("POWERS", result.user!.powers);
         return res.status(200).json({ mesage : "Success", powers: result.user!.powers });
     }
     else 
