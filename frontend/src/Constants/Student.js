@@ -1,4 +1,4 @@
-import {Home, Calendar, FileText, Clock, Book} from 'lucide-react';
+import { Home, Calendar, FileText, Clock, Book, Percent } from 'lucide-react';
 
 export const student = [
     { icon: <Home />, text: "Dashboard", path: "dashboard" },
@@ -6,4 +6,5 @@ export const student = [
     { icon: <FileText />, text: "DocVault", path: "docvault" },
     { icon: <Clock />, text: "TimeTable", path: "timetable" },
     { icon: <Book />, text: "Almanac", path: "almanac" },
+    { icon: <Percent />, text: "Scores", path: "scores" },
 ];

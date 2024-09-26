@@ -41,6 +41,7 @@ function App() {
           <Route path="docvault" element={<StudentDocVault />} />
           <Route path="timetable" element={<StudentTimetable />} />
           <Route path="almanac" element={<StudentAlmanac />} />
+          <Route path="scores" element={<StudentAlmanac />} />
         </Route>
         <Route path="/faculty" element={<Layout />}>
           <Route path="dashboard" element={<FacultyDashboard />} />
