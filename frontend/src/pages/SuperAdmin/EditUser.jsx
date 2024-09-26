@@ -36,7 +36,7 @@ const powerSchema = Yup.object().shape({
 });
 
 export default function EditUser() {
-  const [userPowers, setUserPowers] = useState([]); // Powers already assigned to the user
+  const [userPowers, setUserPowers] = useState([]); 
   const [userId, setUserId] = useState(""); // User ID input
   const [role, setRole] = useState(""); // Role input
   const [fetchComplete, setFetchComplete] = useState(false); // To control the power form rendering
@@ -85,8 +85,9 @@ export default function EditUser() {
           type: data.role,
         }
       );
-      if (Array.isArray(response.data))
-        setUserPowers(response.data.powers); // Set the fetched powers
+      if (Array.isArray(response.data.powers)){
+        setUserPowers(response.data.powers); // Store the power indices
+      }
       setFetchComplete(true); // Allows the power form to be displayed
     } catch (error) {
       console.error("Error fetching powers: ", error);
@@ -104,7 +105,7 @@ export default function EditUser() {
       console.log("Power assigned successfully:", response.data);
       setUserPowers((prev) => [
         ...prev,
-        { id: powerIndex, name: powerType[Object.keys(powerType)[powerIndex]] }, // Get the name from the powerType using the index
+        powerIndex, // Store the index directly
       ]);
     } catch (error) {
       console.error("Error assigning power: ", error);
@@ -112,18 +113,18 @@ export default function EditUser() {
   };
 
   // Handle removing power
-  const handleRemovePower = async (powerId) => {
+  const handleRemovePower = async (powerIndex) => {
     try {
       await axios.post(
         `${process.env.REACT_APP_BASE_URL}/admin/remove-powers`,
         {
           userID: userId,
           type: role,
-          power: powerId, 
+          power: powerIndex, 
         }
       );
       console.log("Power removed successfully");
-      setUserPowers((prev) => prev.filter((power) => power.id !== powerId)); // Update the assigned powers list
+      setUserPowers((prev) => prev.filter((power) => power !== powerIndex)); // Update the assigned powers list
     } catch (error) {
       console.error("Error removing power: ", error);
     }
@@ -202,8 +203,8 @@ export default function EditUser() {
                     <option value="">Select a power</option>
                     {allPowers && allPowers
                       .filter(
-                        (power) => !userPowers.some((p) => p.id === power.id)
-                      ) // Filter out already assigned powers
+                        (power) => !userPowers.includes(power.id) // Filter out already assigned powers
+                      )
                       .map((power) => (
                         <option key={power.id} value={power.id}>
                           {power.name}
@@ -231,14 +232,14 @@ export default function EditUser() {
           <div className="mt-6">
             <h2 className="font-bold">Assigned Powers</h2>
             <ul className="space-y-2 mt-2">
-              {userPowers && userPowers.map((power) => (
+              {userPowers && userPowers.map((powerIndex) => (
                 <li
-                  key={power.id}
+                  key={powerIndex}
                   className="flex justify-between items-center"
                 >
-                  <span>{power.name}</span>
+                  <span>{powerType[Object.keys(powerType)[powerIndex]]}</span> {/* Get the name from the powerType using the index */}
                   <button
-                    onClick={() => handleRemovePower(power.id)}
+                    onClick={() => handleRemovePower(powerIndex)}
                     className="bg-red-500 text-white px-3 py-1 rounded"
                   >
                     Remove
