@@ -59,7 +59,7 @@ const AdminLogin = () => {
     }
     return newErrors;
   };
-
+  axios.defaults.withCredentials = true;
   const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();

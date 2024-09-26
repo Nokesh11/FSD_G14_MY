@@ -5,20 +5,23 @@ import { debugEnum } from '../shared';
 import cookieSession from 'cookie-session';
 import { Request, Response } from 'express';
 import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS } from '../config';
+import cors from "cors";
+
 
 export const app = Router();
-app.use(express.json());
-app.use(cookieSession({
-  name: 'session',
-  keys: COOKIE_SESSION_KEYS,
-  maxAge: COOKIE_MAX_AGE,
-}));
+// app.use(cors());
+// app.use(express.json());
+// app.use(cookieSession({
+//   name: 'session',
+//   keys: COOKIE_SESSION_KEYS,
+//   maxAge: COOKIE_MAX_AGE,
+// }));
 
 // Replace with info-enum
 
-app.post('/verify-creds', async (req : Request, res : Response) => 
+app.post('/verify-creds', async (req , res) => 
 {
-    const { string: userID, string: password, userType: type, string: instID } = req.body;
+    const { userID, password, type, instID } = req.body;
     const result = await AuthDB.verifyCreds(userID, password, type, instID);
     if (result.message === debugEnum.SUCCESS)
     {
@@ -27,6 +30,7 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
         req.session!.instID = instID;
         req.session!.userID = userID;
         req.session!.powers = result.powers;
+        console.log(req.session);
         return res.status(200).json({ 
                                     message: 'Credentials verified successfully.' , 
                                     token : result.token, 
@@ -35,6 +39,7 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
     }
     else 
     {
+        console.log(result.message);
         req.session!.authenticated = false;
         return res.status(401).json({ message: 'Invalid credentials.' });
     }
@@ -42,7 +47,7 @@ app.post('/verify-creds', async (req : Request, res : Response) =>
 
 app.post('/verify-token', async (req, res) => 
 {
-    const { string: userID, string: token, userType: type, string: instID } = req.body;
+    const { userID, token, type, instID } = req.body;
     const result = await AuthDB.verifyToken(userID, token, type, instID);
     if (result.message === debugEnum.SUCCESS) 
     {

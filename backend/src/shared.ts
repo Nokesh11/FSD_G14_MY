@@ -2,23 +2,23 @@ export const enum ticketStatus {RESOLVED, PENDING};
 
 export enum debugEnum 
 {
-    INVALID_CREDENTIALS, 
-    INVALID_INST_ID, 
-    INVALID_USER_ID, 
-    SUCCESS, 
-    POWER_DOES_NOT_EXIST,
-    USER_ALREADY_EXISTS,
-    INVALID_TOKEN,
-    INVALID_TICKET_ID,
-    INVALID_TICKET_STAGE,
-    COL_DOES_NOT_EXIST,
-    QUIZ_ALREADY_EXISTS,
-    QUIZ_DOES_NOT_EXIST,
-    ASSIGNMENT_ALREADY_EXISTS,
-    ASSIGNMENT_DOES_NOT_EXIST,
-    EXAM_ALREADY_EXISTS,
-    EXAM_DOES_NOT_EXIST,
-    INST_ID_ALREADY_EXISTS
+    INVALID_CREDENTIALS,      // 0
+    INVALID_INST_ID,          // 1
+    INVALID_USER_ID,          // 2
+    SUCCESS,                  // 3
+    POWER_DOES_NOT_EXIST,     // 4
+    USER_ALREADY_EXISTS,      // 5
+    INVALID_TOKEN,            // 6
+    INVALID_TICKET_ID,        // 7
+    INVALID_TICKET_STAGE,     // 8
+    COL_DOES_NOT_EXIST,       // 9
+    QUIZ_ALREADY_EXISTS,      // 10
+    QUIZ_DOES_NOT_EXIST,      // 11
+    ASSIGNMENT_ALREADY_EXISTS,// 12
+    ASSIGNMENT_DOES_NOT_EXIST,// 13
+    EXAM_ALREADY_EXISTS,      // 14
+    EXAM_DOES_NOT_EXIST,      // 15
+    INST_ID_ALREADY_EXISTS    // 16
 };
 
 // Have to implemnt course clusters.
@@ -28,6 +28,7 @@ export enum powerType
     DELETE_USER, 
     CHANGE_PASSWORD, 
     EDIT_POWERS,
+    VIEW_POWERS,
     ALL_COURSES_ACCESS,     // have to implement course clusters
     EDIT_ATTENDANCE, 
     ADD_QUIZ,

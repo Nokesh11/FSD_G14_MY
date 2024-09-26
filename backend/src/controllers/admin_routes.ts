@@ -5,20 +5,17 @@ import cookieSession from 'cookie-session';
 import { Request, Response } from 'express';
 import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS } from '../config';
 import { AdminDB } from '../models/admin_db';
+import { Central } from '../models/central_db';
 
 export const app = Router();
-app.use(express.json());
-app.use(cookieSession({
-  name: 'session',
-  keys: COOKIE_SESSION_KEYS,
-  maxAge: COOKIE_MAX_AGE,
-}));
 
 app.post('/create-user', async (req : Request, res : Response) =>
 {
+    console.log(req.session);
     if (req.session!.powers.includes(powerType.CREATE_USER))
     {
-        const { string: userID, string: password, userType: type, string: instID } = req.body;
+        const { userID, password, type } = req.body;
+        const instID = req.session!.instID;
         const result = await AdminDB.createUser(userID, password, type, instID);
         if (result === debugEnum.SUCCESS)
         {
@@ -118,5 +115,24 @@ app.post('/remove-powers', async (req : Request, res : Response) =>
     else 
     {
         return res.status(401).json({ message: 'You do not have the required permissions.' });
+    }
+});
+
+app.post('/get-powers', async (req : Request, res : Response) => 
+{
+    if (req.session!.powers.include(powerType.VIEW_POWERS))
+    {
+        const {userID, type} = req.body;
+        const instID = req.session!.instID;
+        const result = await Central.getUser(userID, type, instID);
+        if (result.message !== debugEnum.SUCCESS)
+        {
+            return res.status(401).json({ message: result.message });
+        }
+        return res.status(200).json({ mesage : "Success", powers: result.user!.powers });
+    }
+    else 
+    {
+        return res.status(401).json({ message : 'You do not have the required permissions.'})
     }
 });

@@ -11,13 +11,14 @@ function AddUserCurr() {
   const [file, setFile] = useState(null); // State for the uploaded file
 
   // Handle form submission for single user
+  axios.defaults.withCredentials = true;
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage(""); // Clear any previous messages
 
     try {
       const response = await axios.post(
-        `${process.env.REACT_APP_BASE_URL}/create-user`,
+        `${process.env.REACT_APP_BASE_URL}/admin/create-user`,
         {
           userID,
           password,

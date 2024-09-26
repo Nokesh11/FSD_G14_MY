@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import { powerType } from '../shared';
 import { TOKEN_CHAR_SET, TOKEN_LENGTH, SALT, SALTING_ROUNDS } from '../config';
-import {ObjectId } from 'mongodb';
+import {ObjectId, Condition } from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum } from '../shared';
 
@@ -35,7 +35,7 @@ export class AuthDB
     public static async verifyCreds (userID: string, password: string, type: string, instID: string): Promise<VerifyRes>
     {
         let returnObj = new VerifyRes(debugEnum.SUCCESS, null, null);
-        const data = await Central.getCol(type, instID);
+        const data = await Central.getCol(instID, type);
         if (data.message !== debugEnum.SUCCESS)
         {
             returnObj.message = data.message;
@@ -43,7 +43,7 @@ export class AuthDB
         }
         const col = data.col;
         const passHash = AuthDB.hash(password);
-        const user = await col!.findOne({_id : new ObjectId(userID), passHash : passHash}); 
+        const user = await col!.findOne({_id : userID, passHash : passHash} as Condition<ObjectId>); 
 
         if (user === null)
         {
@@ -72,7 +72,7 @@ export class AuthDB
         }
         const instDB = data.instDB;
         const tokenHash = AuthDB.hash(token);
-        const tokenDoc = await instDB!.token_col.findOne({_id: new ObjectId (tokenHash), 'userID': userID});
+        const tokenDoc = await instDB!.token_col.findOne({_id: tokenHash, 'userID': userID} as Condition<ObjectId>);
 
         if (tokenDoc === null)
         {
@@ -108,13 +108,13 @@ export class AuthDB
             {
                 const token = AuthDB.genToken();
                 const tokenHash = AuthDB.hash(token);
-                const tokenDoc = await data.instDB!.token_col.findOne({_id : new ObjectId(tokenHash)});
+                const tokenDoc = await data.instDB!.token_col.findOne({_id : tokenHash} as Condition<ObjectId>);
                 if (tokenDoc === null)
                 {
                     // Automatically delete this document after a certain time.
-                    await data.instDB!.token_col.insertOne({_id : new ObjectId(tokenHash), 
+                    await data.instDB!.token_col.insertOne({_id : tokenHash, 
                                                             userID : userID, 
-                                                            createdAt : new Date()});
+                                                            createdAt : new Date()} as Condition<ObjectId>);
                     returnObj.token = token;
                     return returnObj;
                 }

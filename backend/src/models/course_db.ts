@@ -1,4 +1,4 @@
-import { ObjectId, PushOperator, PullOperator} from 'mongodb';
+import { ObjectId, PushOperator, PullOperator, Condition} from 'mongodb';
 import { Central } from './central_db';
 import { admin_type, debugEnum } from '../shared';
 import { UserTree, ColTree } from './central_db';
@@ -74,7 +74,7 @@ export class CourseDB
         {
             const col = Central.mongoClient.db(instID).collection(courseID);
             await col.insertOne({
-                _id : new ObjectId(COURSE_HEADER_ID),
+                _id : COURSE_HEADER_ID,
                 teaching_faculty_id : "",
 
                 // Currently not supporting cutom names for quizzes and exams.
@@ -86,7 +86,7 @@ export class CourseDB
                 exams : [],
                 // Month names, each month will be an attribute with value as an array of dates
                 attendance : [],
-            });
+            } as Condition<ObjectId> );
             Central.mongoClient.db(instID).createCollection(courseID);
         }
         else
@@ -145,14 +145,14 @@ export class CourseDB
             return res.message;
         }
         const col = res.col;
-        await col!.updateOne({_id : new ObjectId(COURSE_HEADER_ID)}, {$set : {teaching_faculty_id : facultyID}});
+        await col!.updateOne({_id : COURSE_HEADER_ID} as Condition<ObjectId>, {$set : {teaching_faculty_id : facultyID} });
         return debugEnum.SUCCESS;
     }
 
     static async addQuiz(courseName: string, year: number, section: string, quizID: string, maxMarks: number, instID: string): Promise<debugEnum> 
     {
         const courseID = `${courseName}-${section}-${year}`;
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
         
         if (res.message !== debugEnum.SUCCESS) {
@@ -169,14 +169,14 @@ export class CourseDB
     
         // Add the quiz to the header document
         await col!.updateOne(
-            { _id: headerID },
+            { _id: headerID } as Condition<ObjectId>,
             { $push: { quizzes: { name: quizID, maxMarks: maxMarks } } as PushOperator<Document>  }
         );
     
         // Update all other documents to add the quiz
         const studentDocs = await col!.find().toArray();
         const updatePromises = studentDocs
-            .filter(doc => doc._id !== headerID) // Filter out the header document
+            .filter(doc => doc._id as unknown as string !== headerID) // Filter out the header document
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
@@ -192,7 +192,7 @@ export class CourseDB
     static async addAssignment (courseName : string, year : number, section : string, assignmentID : string, maxMarks : number, instID : string): Promise<debugEnum> 
     {
         const courseID = `${courseName}-${section}-${year}`;
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
         
         if (res.message !== debugEnum.SUCCESS) {
@@ -213,7 +213,7 @@ export class CourseDB
     
         // Add the assignment to the header document
         await col!.updateOne(
-            { _id: headerID },
+            { _id: headerID } as Condition<ObjectId>,
             { $push: { assignments: { name: assignmentID, maxMarks: maxMarks } } as PushOperator<Document> }
         );
     
@@ -236,7 +236,7 @@ export class CourseDB
     static async addExam (courseName : string, year : number, section : string, examID : string, maxMarks : number, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
         
         if (res.message !== debugEnum.SUCCESS) {
@@ -257,7 +257,7 @@ export class CourseDB
     
         // Add the exam to the header document
         await col!.updateOne(
-            { _id: headerID },
+            { _id: headerID } as Condition<ObjectId>,
             { $push: { exams: { name: examID, maxMarks: maxMarks } } as PushOperator<Document> }
         );
     
@@ -282,7 +282,7 @@ export class CourseDB
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         if (res.message !== debugEnum.SUCCESS)
         {
             return res.message;
@@ -310,13 +310,13 @@ export class CourseDB
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         if (res.message !== debugEnum.SUCCESS)
         {
             return res.message;
         }
         const col = res.col;
-        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {quizzes : {name : quizID} } as PullOperator<Document>} );
+        const updatedCount = await col!.updateOne({_id : headerID} as Condition<ObjectId>, { $pull : {quizzes : {name : quizID} } as PullOperator<Document>} );
         if (updatedCount.modifiedCount === 0)
         {
             return debugEnum.QUIZ_DOES_NOT_EXIST;
@@ -339,13 +339,13 @@ export class CourseDB
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
-        const headerID = new ObjectId(COURSE_HEADER_ID);
+        const headerID = COURSE_HEADER_ID;
         if (res.message !== debugEnum.SUCCESS)
         {
             return res.message;
         }
         const col = res.col;
-        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {assignments : {name : assignmentID} } as PullOperator<Document>} );
+        const updatedCount = await col!.updateOne({_id : headerID} as Condition<ObjectId>, { $pull : {assignments : {name : assignmentID} } as PullOperator<Document>} );
         if (updatedCount.modifiedCount === 0)
         {
             return debugEnum.ASSIGNMENT_DOES_NOT_EXIST;
@@ -387,7 +387,7 @@ export class CourseDB
         const student = data.user;
         let quizzes = student!.quizzes;
         quizzes[quizIndex] = score;
-        await col!.updateOne({_id : new ObjectId(studentID)}, { $set : {quizzes : quizzes}});
+        await col!.updateOne({_id : studentID } as Condition<ObjectId> , { $set : {quizzes : quizzes}});
         return debugEnum.SUCCESS;
     }
 
@@ -413,7 +413,7 @@ export class CourseDB
         const student = data.user;
         let assignments = student!.assignments;
         assignments[assignmentIndex] = score;
-        await col!.updateOne({_id : new ObjectId(studentID)}, { $set : {assignments : assignments}});
+        await col!.updateOne({_id : studentID} as Condition<ObjectId>, { $set : {assignments : assignments}});
         return debugEnum.SUCCESS;
     }
 
@@ -439,7 +439,7 @@ export class CourseDB
         const student = data.user;
         let exams = student!.exams;
         exams[examIndex] = score;
-        await col!.updateOne({_id : new ObjectId(studentID)}, { $set : {exams : exams}});
+        await col!.updateOne({_id : studentID} as Condition<ObjectId>, { $set : {exams : exams}});
         return debugEnum.SUCCESS;
     }
 

@@ -1,4 +1,4 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, Condition, Collection } from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum, powerType } from '../shared';
 import { AuthDB } from './auth_db';
@@ -15,7 +15,7 @@ export class AdminDB{
         {        
             const col = data.col;
             const passHash = AuthDB.hash(password);
-            await col!.updateOne({_id : new ObjectId(userID)}, {$set : {passHash : passHash}});
+            await col!.updateOne({_id : userID} as Condition<ObjectId>, {$set : {passHash : passHash}});
             return debugEnum.SUCCESS;
         }
     }
@@ -28,7 +28,7 @@ export class AdminDB{
         if (data.message === debugEnum.INVALID_USER_ID)
         {
             const passHash = AuthDB.hash(password);
-            await data.col!.insertOne({_id : new ObjectId(userID), passHash : passHash});
+            await data.col!.insertOne({_id : userID, passHash : passHash, powers : [], courses : [], curSem : 1, active_tickets : [], resolved_tickets : []} as Condition<ObjectId>);
             return debugEnum.SUCCESS;
         }
         else 
@@ -54,14 +54,14 @@ export class AdminDB{
         }     
         else 
         {
-            await data.col!.deleteOne({_id : new ObjectId(userID)});
+            await data.col!.deleteOne({_id : userID} as Condition<ObjectId>);
             return debugEnum.SUCCESS;
         }
     }
 
     static async deleteToken (token: string, instDB: Central): Promise<debugEnum>
     {
-        const res = await instDB.token_col.deleteOne({_id : new ObjectId(token)});
+        const res = await instDB.token_col.deleteOne({_id : token} as Condition<ObjectId>);
         if (res.deletedCount === 0)
         {
             return debugEnum.INVALID_TOKEN;
@@ -80,7 +80,7 @@ export class AdminDB{
         {
             let powers = data.user!.powers;
             powers.push(power);
-            await data.col!.updateOne({_id : new ObjectId(userID)}, {$set : {powers : powers}});
+            await data.col!.updateOne({_id : userID} as Condition<ObjectId>, {$set : {powers : powers}});
             return debugEnum.SUCCESS;
         }
     }
@@ -101,7 +101,7 @@ export class AdminDB{
                 return debugEnum.POWER_DOES_NOT_EXIST;
             }
             powers.splice(index, 1);
-            await data.col!.updateOne({_id : new ObjectId(userID)}, {$set : {powers : powers}});
+            await data.col!.updateOne({_id : userID} as Condition<ObjectId>, {$set : {powers : powers}});
             return debugEnum.SUCCESS;
         }
     }
@@ -117,7 +117,7 @@ export class AdminDB{
         }
         else 
         {
-            await data.col!.updateOne({_id : new ObjectId(userID)}, {$set : {courses : courses}});
+            await data.col!.updateOne({_id : userID } as Condition<ObjectId>, {$set : {courses : courses}});
             return debugEnum.SUCCESS;
         }
     }
@@ -132,8 +132,21 @@ export class AdminDB{
         }
         else 
         {
-            await data.col!.updateOne({_id : new ObjectId(userID)}, {$set : {courses : courses}});
+            await data.col!.updateOne({_id : userID} as Condition<ObjectId>, {$set : {courses : courses}});
             return debugEnum.SUCCESS;
         }
     }
+
+    // static async getPowers(userID: string, type: string, instID: string): Promise<Array<powerType>>
+    // {
+    //     const data = await Central.getUser(userID, type, instID);
+    //     if (data.message !== debugEnum.SUCCESS)
+    //     {
+    //         return data.message;
+    //     }
+    //     else 
+    //     {
+    //         return data.user!.powers;
+    //     }
+    // }
 }

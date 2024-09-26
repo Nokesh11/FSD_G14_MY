@@ -1,4 +1,4 @@
-import { Db, Collection, Document, MongoClient, ObjectId} from 'mongodb';
+import { Db, Collection, Document, MongoClient, ObjectId, Condition} from 'mongodb';
 import { MONGO_URL } from '../config'
 import { debugEnum } from '../shared';
 
@@ -129,6 +129,8 @@ export class Central
     {
         const databasesList = await Central.mongoClient.db().admin().listDatabases();
 
+        console.log("INSTID", instID);
+        console.log(databasesList.databases);
         // For now do not use cache, just fetch the obj every single time..
         if (databasesList.databases.some(db => db.name === instID) == true )
         {
@@ -173,7 +175,10 @@ export class Central
         }
         else 
         {
-            const user = await data.col!.findOne({_id : new ObjectId(userID)});
+            console.log(userID);
+            // let obj = new ObjectId(userID);
+            // console.log(obj);
+            const user = await data.col!.findOne({_id : userID} as Condition<ObjectId>);
             if (user === null)
             {
                 returnObj.message = debugEnum.INVALID_USER_ID;
@@ -188,7 +193,7 @@ export class Central
     public static async createInst (instID : string) : Promise<debugEnum>
     {
         const databasesList = await Central.mongoClient.db().admin().listDatabases();
-        if (databasesList.databases.some(db => db.name === instID) == true )
+        if (databasesList.databases.some(db => db.name === instID) == false )
         {
             // Create db in mongo 
             const db = Central.mongoClient.db(instID);

@@ -1,10 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { ObjectId, Condition} from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum } from '../shared';
 
 interface TicketInterface //InterfaceTicket
 {
-    _id : ObjectId,
+    _id : Condition<ObjectId>,
     fromID : string,
     from_userType : string,
     toID : string, 
@@ -49,14 +49,14 @@ export class TicketDB
             while ( true )
             {
                 const ticketID = this.genTicketID(ticket.fromID, ticket.toID);
-                const ticketDoc = await instDB!.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
+                const ticketDoc = await instDB!.ticket_col.findOne({'_id' : ticketID} as Condition<ObjectId>);
                 if (ticketDoc === null)
                 {
-                    ticket._id = new ObjectId(ticketID);
+                    ticket._id = ticketID as unknown as Condition<ObjectId>;
                     await instDB!.ticket_col.insertOne(ticket);
                     let currentTickets = data.user!.active_tickets;
-                    currentTickets.push(new ObjectId(ticketID));
-                    await col!.updateOne({_id : new ObjectId(ticket.fromID)}, {$set : {active_tickets : currentTickets}});
+                    currentTickets.push(ticketID);
+                    await col!.updateOne({_id : ticket.fromID} as Condition<ObjectId>, {$set : {active_tickets : currentTickets}});
                     return ticketID;
                 }
             }
@@ -77,14 +77,14 @@ export class TicketDB
         {
             return debugEnum.INVALID_INST_ID;
         }
-        const ticket = await instDB.ticket_col.findOne({'_id' : new ObjectId(ticketID)});
+        const ticket = await instDB.ticket_col.findOne({'_id' : ticketID} as Condition<ObjectId>);
         if (ticket === null)
         {
             return debugEnum.INVALID_TICKET_ID;
         }
         if (ticket.stages.includes(stage))
         {
-            instDB.ticket_col.updateOne({'_id' : new ObjectId(ticketID)}, {$set : {curStage : stage}});
+            instDB.ticket_col.updateOne({'_id' : ticketID} as Condition<ObjectId>, {$set : {curStage : stage}});
             if (stage === "RESOLVED")
             {
                 const data = await Central.getUser(ticket.fromID, ticket.from_userType, instID);
@@ -96,7 +96,7 @@ export class TicketDB
                     resolvedTickets.push(ticketID);
                     const index = active_tickets.indexOf(ticketID);
                     active_tickets.splice(index, 1);
-                    await col!.updateOne({'_id' : new ObjectId(ticket.fromID as string)}, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
+                    await col!.updateOne({'_id' : ticket.fromID as string} as Condition<ObjectId>, {$set : {active_tickets : active_tickets, resolved_tickets : resolvedTickets}});
                     return debugEnum.SUCCESS;
                 }
                 else 
@@ -112,7 +112,7 @@ export class TicketDB
     {
         return new Promise<TicketInterface | null>(async (resolve, reject) => {
             const instDB = await Central.getInstDB(instID);
-            const ticket = await instDB?.ticket_col.findOne({'_id' : new ObjectId(ticketID)}) ?? null;
+            const ticket = await instDB?.ticket_col.findOne({'_id' : ticketID} as Condition<ObjectId>) ?? null;
             return ticket;
 
         });
