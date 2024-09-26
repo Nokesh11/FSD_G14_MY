@@ -31,6 +31,11 @@ function AddUserCurr() {
       const errorMessage =
         error.response?.data?.message || "An error occurred.";
       setMessage(errorMessage); // Display error message
+    }finally{
+      setUserID("");
+      setPassword("");
+      setUserType("");
+      setInstID("");
     }
   };
 
