@@ -30,11 +30,45 @@ interface CourseStudentDocument
     exams : Array<QAEStudent>;
 }
 
+export class getCoursesRes 
+{
+    public courses : Array<string> | null;
+    public message : debugEnum;
+    constructor()
+    {
+        this.courses = null;
+        this.message = debugEnum.INVALID_INST_ID;
+    }
+}
+
 export class CourseDB
 {
+    static async getCourses (userId : string, instID : string, type : string): Promise <getCoursesRes>
+    {
+        let returnObj = new getCoursesRes();
+        const data = await Central.getUser(userId, type, instID);
+        if (data.message !== debugEnum.SUCCESS)
+        {
+            returnObj.message = data.message;
+            return returnObj;
+        }
+        const user = data.user;
+        returnObj.message = debugEnum.SUCCESS; 
+        if (type === admin_type)
+        {
+            returnObj.courses = user!.courses;  
+            return returnObj;
+        }
+        else 
+        {
+            returnObj.courses = user!.courses[user!.curSem];
+            return returnObj;
+        }
+    }
+
     static async createCourse (courseName : string, year : number, section : string, instID : string)
     {
-        const courseID = courseName + '-' + section + '-' + year;
+        const courseID =  `${courseName}-${section}-${year}`;
         const res = await Central.getCol(instID, courseID);
         if (res.message === debugEnum.COL_DOES_NOT_EXIST)
         {
@@ -115,7 +149,7 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async addQuiz(courseName: string, year: number, section: string, quizName: string, maxMarks: number, instID: string): Promise<debugEnum> 
+    static async addQuiz(courseName: string, year: number, section: string, quizID: string, maxMarks: number, instID: string): Promise<debugEnum> 
     {
         const courseID = `${courseName}-${section}-${year}`;
         const headerID = new ObjectId(COURSE_HEADER_ID);
@@ -128,7 +162,7 @@ export class CourseDB
         const headerDoc = res.user as CourseHeaderDocument;
         const col = res.col;
     
-        if (headerDoc!.quizzes.some(quiz => quiz.name === quizName)) 
+        if (headerDoc!.quizzes.some(quiz => quiz.name === quizID)) 
         {
             return debugEnum.QUIZ_ALREADY_EXISTS;
         }
@@ -136,7 +170,7 @@ export class CourseDB
         // Add the quiz to the header document
         await col!.updateOne(
             { _id: headerID },
-            { $push: { quizzes: { name: quizName, maxMarks: maxMarks } } as PushOperator<Document>  }
+            { $push: { quizzes: { name: quizID, maxMarks: maxMarks } } as PushOperator<Document>  }
         );
     
         // Update all other documents to add the quiz
@@ -146,7 +180,7 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $push: { quizzes: { name: quizName, marks: 0 } } as PushOperator<Document> } 
+                    { $push: { quizzes: { name: quizID, marks: 0 } } as PushOperator<Document> } 
                 )
             );
     
@@ -155,7 +189,7 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async addAssignment (courseName : string, year : number, section : string, assignmentName : string, maxMarks : number, instID : string): Promise<debugEnum> 
+    static async addAssignment (courseName : string, year : number, section : string, assignmentID : string, maxMarks : number, instID : string): Promise<debugEnum> 
     {
         const courseID = `${courseName}-${section}-${year}`;
         const headerID = new ObjectId(COURSE_HEADER_ID);
@@ -171,7 +205,7 @@ export class CourseDB
         // Check if the assignment already exists
         for (let assignment of headerDoc!.assignments)
         {
-            if (assignment.name === assignmentName)
+            if (assignment.name === assignmentID)
             {
                 return debugEnum.QUIZ_ALREADY_EXISTS;
             }
@@ -180,7 +214,7 @@ export class CourseDB
         // Add the assignment to the header document
         await col!.updateOne(
             { _id: headerID },
-            { $push: { assignments: { name: assignmentName, maxMarks: maxMarks } } as PushOperator<Document> }
+            { $push: { assignments: { name: assignmentID, maxMarks: maxMarks } } as PushOperator<Document> }
         );
     
         // Update all other documents to add the assignment
@@ -190,7 +224,7 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $push: { assignments: { name: assignmentName, marks: 0 } } as PushOperator<Document> } // Use correct structure
+                    { $push: { assignments: { name: assignmentID, marks: 0 } } as PushOperator<Document> } // Use correct structure
                 )
             );
     
@@ -199,7 +233,7 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async addExam (courseName : string, year : number, section : string, examName : string, maxMarks : number, instID : string): Promise<debugEnum>
+    static async addExam (courseName : string, year : number, section : string, examID : string, maxMarks : number, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const headerID = new ObjectId(COURSE_HEADER_ID);
@@ -215,7 +249,7 @@ export class CourseDB
         // Check if the exam already exists
         for (let exam of headerDoc!.exams)
         {
-            if (exam.name === examName)
+            if (exam.name === examID)
             {
                 return debugEnum.QUIZ_ALREADY_EXISTS;
             }
@@ -224,7 +258,7 @@ export class CourseDB
         // Add the exam to the header document
         await col!.updateOne(
             { _id: headerID },
-            { $push: { exams: { name: examName, maxMarks: maxMarks } } as PushOperator<Document> }
+            { $push: { exams: { name: examID, maxMarks: maxMarks } } as PushOperator<Document> }
         );
     
         // Update all other documents to add the exam
@@ -234,7 +268,7 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $push: { exams: { name: examName, marks: 0 } } as PushOperator<Document> } 
+                    { $push: { exams: { name: examID, marks: 0 } } as PushOperator<Document> } 
                 )
             );
     
@@ -244,7 +278,7 @@ export class CourseDB
     }
 
     // Gotta remove these from student records too...
-    static async deleteExam (courseName : string, year : number, section : string, examName : string, instID : string): Promise<debugEnum>
+    static async deleteExam (courseName : string, year : number, section : string, examID : string, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -254,7 +288,7 @@ export class CourseDB
             return res.message;
         }
         const col = res.col;
-        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {exams : {name : examName} } as PullOperator<Document>} );
+        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {exams : {name : examID} } as PullOperator<Document>} );
         if (updatedCount.modifiedCount === 0)
         {
             return debugEnum.EXAM_DOES_NOT_EXIST;
@@ -265,14 +299,14 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $pull : {exams : {name : examName} } as PullOperator<Document> } 
+                    { $pull : {exams : {name : examID} } as PullOperator<Document> } 
                 )
             );
         await Promise.all(updatePromises);
         return debugEnum.SUCCESS;
     }
     
-    static async deleteQuiz (courseName : string, year : number, section : string, quizName : string, instID : string): Promise<debugEnum>
+    static async deleteQuiz (courseName : string, year : number, section : string, quizID : string, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -282,7 +316,7 @@ export class CourseDB
             return res.message;
         }
         const col = res.col;
-        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {quizzes : {name : quizName} } as PullOperator<Document>} );
+        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {quizzes : {name : quizID} } as PullOperator<Document>} );
         if (updatedCount.modifiedCount === 0)
         {
             return debugEnum.QUIZ_DOES_NOT_EXIST;
@@ -294,14 +328,14 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $pull : {quizzes : {name : quizName} } as PullOperator<Document> } 
+                    { $pull : {quizzes : {name : quizID} } as PullOperator<Document> } 
                 )
             );
         await Promise.all(updatePromises);
         return debugEnum.SUCCESS;
     }
 
-    static async deleteAssignment (courseName : string, year : number, section : string, assignmentName : string, instID : string): Promise<debugEnum>
+    static async deleteAssignment (courseName : string, year : number, section : string, assignmentID : string, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -311,7 +345,7 @@ export class CourseDB
             return res.message;
         }
         const col = res.col;
-        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {assignments : {name : assignmentName} } as PullOperator<Document>} );
+        const updatedCount = await col!.updateOne({_id : headerID}, { $pull : {assignments : {name : assignmentID} } as PullOperator<Document>} );
         if (updatedCount.modifiedCount === 0)
         {
             return debugEnum.ASSIGNMENT_DOES_NOT_EXIST;
@@ -322,14 +356,14 @@ export class CourseDB
             .map(doc => 
                 col!.updateOne(
                     { _id: doc._id }, 
-                    { $pull : {assignments : {name : assignmentName} } as PullOperator<Document> } 
+                    { $pull : {assignments : {name : assignmentID} } as PullOperator<Document> } 
                 )
             );
         await Promise.all(updatePromises);
         return debugEnum.SUCCESS;
     }
 
-    static async editQuizScore (courseName : string, year : number, section : string, quizName : string, studentID : string, score : number, instID : string): Promise<debugEnum>
+    static async editQuizScore (courseName : string, year : number, section : string, quizID : string, studentID : string, score : number, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -339,7 +373,7 @@ export class CourseDB
         }
         const col = res.col;
         const headerDoc = res.user as CourseHeaderDocument;
-        const quizIndex = headerDoc!.quizzes.findIndex(quiz => quiz.name === quizName);
+        const quizIndex = headerDoc!.quizzes.findIndex(quiz => quiz.name === quizID);
         if (quizIndex === -1) 
         {
             return debugEnum.QUIZ_DOES_NOT_EXIST; // Quiz doesn't exist
@@ -357,7 +391,7 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async editAssignmentScore (courseName : string, year : number, section : string, assignmentName : string, studentID : string, score : number, instID : string): Promise<debugEnum>
+    static async editAssignmentScore (courseName : string, year : number, section : string, assignmentID : string, studentID : string, score : number, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -367,7 +401,7 @@ export class CourseDB
         }
         const col = res.col;
         const headerDoc = res.user as CourseHeaderDocument;
-        const assignmentIndex = headerDoc!.assignments.findIndex(assignment => assignment.name === assignmentName);
+        const assignmentIndex = headerDoc!.assignments.findIndex(assignment => assignment.name === assignmentID);
         if (assignmentIndex === -1) {
             return debugEnum.ASSIGNMENT_DOES_NOT_EXIST; // Assignment doesn't exist
         }
@@ -383,7 +417,7 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async editExamScore (courseName : string, year : number, section : string, examName : string, studentID : string, score : number, instID : string): Promise<debugEnum>
+    static async editExamScore (courseName : string, year : number, section : string, examID : string, studentID : string, score : number, instID : string): Promise<debugEnum>
     {
         const courseID = `${courseName}-${section}-${year}`;
         const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
@@ -393,7 +427,7 @@ export class CourseDB
         }
         const col = res.col;
         const headerDoc = res.user as CourseHeaderDocument;
-        const examIndex = headerDoc!.exams.findIndex(exam => exam.name === examName);
+        const examIndex = headerDoc!.exams.findIndex(exam => exam.name === examID);
         if (examIndex === -1) {
             return debugEnum.EXAM_DOES_NOT_EXIST; // Exam doesn't exist
         }
@@ -409,24 +443,24 @@ export class CourseDB
         return debugEnum.SUCCESS;
     }
 
-    static async addAttendanceDate (courseName : string, year : number, section : string, month : string, date : number, instID : string): Promise<debugEnum>
-    {
-        const courseID = `${courseName}-${section}-${year}`;
-        const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
-        if (res.message !== debugEnum.SUCCESS)
-        {
-            return res.message;
-        }
-        const col = res.col;
-        const headerDoc = res.user as CourseHeaderDocument;
-        const attendance = headerDoc!.attendance;
-        if (attendance.some(att => att[month] !== undefined))
-        {
-            return debugEnum.ATTENDANCE_DATE_ALREADY_EXISTS;
-        }
-        let newAttendance = {};
-        newAttendance[month] = [date];
-        await col!.updateOne({_id : new ObjectId(COURSE_HEADER_ID)}, { $push : {attendance : newAttendance}});
-        return debugEnum.SUCCESS;
-    }
+    // static async addAttendanceDate (courseName : string, year : number, section : string, month : string, date : number, instID : string): Promise<debugEnum>
+    // {
+    //     const courseID = `${courseName}-${section}-${year}`;
+    //     const res = await Central.getUser(COURSE_HEADER_ID, courseID, instID);
+    //     if (res.message !== debugEnum.SUCCESS)
+    //     {
+    //         return res.message;
+    //     }
+    //     const col = res.col;
+    //     const headerDoc = res.user as CourseHeaderDocument;
+    //     const attendance = headerDoc!.attendance;
+    //     if (attendance.some(att => att[month] !== undefined))
+    //     {
+    //         return debugEnum.ATTENDANCE_DATE_ALREADY_EXISTS;
+    //     }
+    //     let newAttendance = {};
+    //     newAttendance[month] = [date];
+    //     await col!.updateOne({_id : new ObjectId(COURSE_HEADER_ID)}, { $push : {attendance : newAttendance}});
+    //     return debugEnum.SUCCESS;
+    // }
 }
