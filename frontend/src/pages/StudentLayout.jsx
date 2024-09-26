@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import { useState, createContext } from "react";
-import Appbar from "../../components/Appbar";
-import Sidebar from "../../components/Sidebar";
+import Appbar from "../components/Appbar";
+import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
 
 export const sidebarContext = createContext();
