@@ -6,10 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 const validateUsername = (username, isAdmin = false) => {
   if (!username) return "Username is required";
-  const rolePrefix = isAdmin ? 'F' : 'S'; // 'F' for admin, 'S' for student
-  if (!new RegExp(`^${rolePrefix}[a-zA-Z0-9]+$`).test(username)) {
-    return `Invalid username. Must start with '${rolePrefix}' for ${isAdmin ? 'admin' : 'student'}.`;
-  }
+  // const rolePrefix = isAdmin ? 'F' : 'S'; // 'F' for admin, 'S' for student
+  // if (!new RegExp(`^${rolePrefix}[a-zA-Z0-9]+$`).test(username)) {
+  //   return `Invalid username. Must start with '${rolePrefix}' for ${isAdmin ? 'admin' : 'student'}.`;
+  // }
   return '';
 };
 
@@ -35,7 +35,7 @@ export default function LoginForm() {
   const handleLoginClick = () => {
     setIsActive(false);
   };
-  
+
   const handleSubmit = async (e, role) => {
     e.preventDefault();
     const data = role === 'admin' ? signupData : loginData; // Use the appropriate data based on the role
@@ -43,8 +43,9 @@ export default function LoginForm() {
     const instituteIdError = !data.instituteId ? 'Institute Id is required' : '';
     const usernameError = validateUsername(data.username, role === 'admin'); // Pass role for validation
     const passwordError = validatePassword(data.password);
-  
+
     if (instituteIdError || usernameError || passwordError) {
+      console.log(instituteIdError, usernameError, passwordError);
       setErrors((prevErrors) => ({
         ...prevErrors,
         [role]: { instituteId: instituteIdError, username: usernameError, password: passwordError },
@@ -56,15 +57,14 @@ export default function LoginForm() {
         userType: role,
         instID: data.instituteId
       }
-      console.log(formattedData);
       const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/verify-creds`, formattedData);
-      if(response.status === 200){
+      if (response.status === 200) {
         localStorage.setItem('token', response.data.data.token);
         const userRole = response.data.data.role;
         localStorage.setItem('role', userRole);
-        if(role === "faculty") navigate("/faculty/dashboard");
-        if(role === "student") navigate("/student/dashboard");
-      }else{
+        if (role === "faculty") navigate("/faculty/dashboard");
+        if (role === "student") navigate("/student/dashboard");
+      } else {
         setError(response.data.message);
       }
       setSignupData({ instituteId: '', username: '', password: '' });
@@ -72,7 +72,7 @@ export default function LoginForm() {
       setErrors({ login: {}, signup: {} }); // Clear errors after successful login/signup
     }
   };
-  
+
   // Dynamic username field styling
   const handleUsernameChange = (e) => {
     const username = e.target.value;
@@ -189,7 +189,7 @@ export default function LoginForm() {
       {/* Sign-up Form */}
       <div className="form-box register">
         <h2 className="title animation" style={{ "--i": 17, "--j": 0 }}>
-          Login 
+          Login
         </h2>
         <form onSubmit={(e) => handleSubmit(e, 'admin')}>
           <div className="input-box animation" style={{ "--i": 1, "--j": 22 }}>
