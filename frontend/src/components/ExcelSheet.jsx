@@ -1,89 +1,113 @@
-import 'smart-webcomponents-react/source/styles/smart.default.css';
-import { Grid } from 'smart-webcomponents-react/grid';
+import * as React from 'react';
+import { DataGrid } from '@mui/x-data-grid';
+import Button from '@mui/material/Button';
+import { useState, useCallback } from 'react';
+import { format, addDays } from 'date-fns';
+import axios from 'axios'; // Ensure axios is installed
 
-export default function Home() {
-	const behavior = {
-		columnResizeMode: 'growAndShrink'
-	}
+export default function BasicEditingGrid() {
+  const [columns, setColumns] = useState(initialColumns);
+  const [rows, setRows] = useState(initialRows);
 
-	const appearance = {
-		alternationCount: 2,
-		showRowHeader: true,
-		showRowHeaderSelectIcon: true,
-		showRowHeaderFocusIcon: true
-	}
+  const addColumn = useCallback(() => {
+    const newDate = format(addDays(new Date(), columns.length), 'dd/MM/yyyy');
 
-	const paging = {
-		enabled: true
-	}
+    const newColumn = {
+      field: newDate,
+      headerName: newDate,
+      width: 180,
+      editable: true,
+    };
 
-	const pager = {
-		visible: true
-	}
+    setColumns((prevColumns) => [...prevColumns, newColumn]);
 
-	const sorting = {
-		enabled: true
-	}
+    // Update existing rows to include the new column with default values
+    setRows((prevRows) =>
+      prevRows.map((row) => ({
+        ...row,
+        [newDate]: '', // Default value for the new column
+      }))
+    );
+  }, [columns.length]);
 
-	const editing = {
-		enabled: true
-	}
+  // Function to handle cell edit commits
+  const handleCellEditCommit = async (params) => {
+	console.log(params);
+    const studentName = params.row.name; // Get student name
+    const date = params.field; // Get the date (column field)
+    const newValue = params.value; // Get the new value
 
-	const selection = {
-		enabled: true,
-		allowCellSelection: true,
-		allowRowHeaderSelection: true,
-		allowColumnHeaderSelection: true,
-		mode: 'extended'
-	}
+    console.log(`Student Name: ${studentName}, Date: ${date}, New Value: ${newValue}`);
 
-	const dataSource = [  
-		  { "firstName": "Beate", "lastName": "Wilson", "productName": "Caramel Latte"},   
-		  { "firstName": "Ian", "lastName": "Nodier", "productName": "Caramel Latte"},   
-		  { "firstName": "Petra", "lastName": "Vileid", "productName": "Green Tea"},   
-		  { "firstName": "Mayumi", "lastName": "Ohno", "productName": "Caramel Latte"},   
-		  { "firstName": "Mayumi", "lastName": "Saylor", "productName": "Espresso con Panna"},   
-		  { "firstName": "Regina", "lastName": "Fuller", "productName": "Caffe Americano" },  
-		  { "firstName": "Regina", "lastName": "Burke", "productName": "Caramel Latte"},   
-		  { "firstName": "Andrew", "lastName": "Petersen", "productName": "Caffe Americano"},  
-		  { "firstName": "Martin", "lastName": "Ohno", "productName": "Espresso con Panna"},   
-		  { "firstName": "Beate", "lastName": "Devling", "productName": "Green Tea"},   
-		  { "firstName": "Sven", "lastName": "Devling", "productName": "Espresso Truffle"},  
-		  { "firstName": "Petra", "lastName": "Burke", "productName": "Peppermint Mocha Twist"},  
-		  { "firstName": "Marco", "lastName": "Johnes", "productName": "Caffe Mocha"}  
-	]
+    // Example request to backend
+    try {
+      await axios.post('/api/update', {
+        studentName,
+        date,
+        newValue,
+      });
+      console.log('Data sent to the backend successfully');
+    } catch (error) {
+      console.error('Error sending data to the backend:', error);
+    }
+  };
 
-	const columns = [{
-		label: 'First Name',
-		dataField: 'firstName'
-	},
-	{
-		label: 'Last Name',
-		dataField: 'lastName'
-	},
-	{
-		label: 'Product',
-		dataField: 'productName'
-	}
-	]
-
-
-		return (
-			<div>
-				<div>The Grid in this demo displays data in a series of rows and columns. This
-			        is the simplest case when the Grid is bound to a local data source.</div>
-				<Grid
-					dataSource={dataSource}
-					columns={columns}
-					appearance={appearance}
-					behavior={behavior}
-					selection={selection}
-					paging={paging}
-					pager={pager}
-					sorting={sorting}
-					editing={editing}
-					>
-				</Grid>
-			</div>
-		);
+  return (
+    <div style={{ height: 400, width: '100%', padding: '16px', backgroundColor: '#ffffff' }}>
+      <Button
+        variant="contained"
+        onClick={addColumn}
+        style={{ marginBottom: 16, backgroundColor: '#1976d2', color: '#ffffff' }}
+      >
+        Add New Column (Date)
+      </Button>
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        onCellEditCommit={handleCellEditCommit} // Attach the edit commit handler
+        sx={{
+          '& .MuiDataGrid-root': {
+            border: '1px solid #e0e0e0',
+            borderRadius: '4px',
+          },
+          '& .MuiDataGrid-columnHeaders': {
+            backgroundColor: '#1976d2',
+            color: '#000000',
+            fontWeight: 'bold',
+            borderBottom: '2px solid #e0e0e0',
+          },
+          '& .MuiDataGrid-cell': {
+            borderBottom: '1px solid #e0e0e0',
+            padding: '8px',
+            color: '#333333',
+          },
+          '& .MuiDataGrid-row:nth-of-type(odd)': {
+            backgroundColor: '#f9f9f9',
+          },
+          '& .MuiDataGrid-row:nth-of-type(even)': {
+            backgroundColor: '#ffffff',
+          },
+          '& .MuiDataGrid-row:hover': {
+            backgroundColor: '#e0f7fa',
+          },
+          '& .MuiDataGrid-footerContainer': {
+            borderTop: '2px solid #e0e0e0',
+            backgroundColor: '#f1f1f1',
+          },
+        }}
+      />
+    </div>
+  );
 }
+
+// Initial column definitions
+const initialColumns = [
+  { field: 'name', headerName: 'Name', width: 180, editable: false },
+];
+
+// Initial row data with hardcoded names
+const initialRows = [
+  { id: 1, name: 'Jon Snow' },
+  { id: 2, name: 'Arya Stark' },
+  { id: 3, name: 'Tyrion Lannister' },
+];

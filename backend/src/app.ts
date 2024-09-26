@@ -4,6 +4,7 @@ import MongoClient from 'mongodb';
 
 /*          Router imports                */
 import { app as authRouter } from './controllers/auth_routes';
+import { app as adminRouter } from './controllers/admin_routes';
 
 import { Central } from './models/central_db';
 import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS, PORT } from './config';
@@ -20,6 +21,8 @@ app.use(cookieSession({
   maxAge: COOKIE_MAX_AGE,
 }));
 
+app.use('/auth', authRouter);
+app.use('/admin', adminRouter);
 
 app.get('/', (req, res) => {
   res.send('Server is up and running');

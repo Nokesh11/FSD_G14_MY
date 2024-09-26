@@ -17,7 +17,6 @@ import {
     Button,
 } from "@mui/material";
 import Calendar from "../../components/Calender";
-import AttendanceChart from "../../components/AttendanceChart";
 import TicketTable from "../../components/TicketTable";
 import AnnouncementsTable from "../../components/Announcements";
 import DeleteIcon from "@mui/icons-material/Delete";

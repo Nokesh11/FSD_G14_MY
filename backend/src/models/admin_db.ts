@@ -1,11 +1,10 @@
-import { userType } from '../shared';
 import { ObjectId } from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum, powerType } from '../shared';
 import { AuthDB } from './auth_db';
 
 export class AdminDB{
-    static async changePassword (userID: string, password: string, type: userType, instID: string): Promise<debugEnum>
+    static async changePassword (userID: string, password: string, type: string, instID: string): Promise<debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -22,7 +21,7 @@ export class AdminDB{
     }
 
     // Returns false if usertype does not exist or user already exists, else returns true
-    static async createUser (userID: string, password: string, type: userType, instID : string): Promise<debugEnum>
+    static async createUser (userID: string, password: string, type: string, instID : string): Promise<debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
 
@@ -46,7 +45,7 @@ export class AdminDB{
     }
 
     // Returns false if usertype does not exist or user does not exist, else returns true
-    static async deleteUser (userID: string, type : userType, instID : string): Promise<debugEnum>
+    static async deleteUser (userID: string, type: string, instID : string): Promise<debugEnum>
     {   
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -70,7 +69,7 @@ export class AdminDB{
         return debugEnum.SUCCESS;
     }
 
-    static async givePowers (userID: string, type : userType, instID : string, power: powerType): Promise<debugEnum>
+    static async givePowers (userID: string, type: string, instID : string, power: powerType): Promise<debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -86,7 +85,7 @@ export class AdminDB{
         }
     }
 
-    static async removePowers (userID: string, type: userType, power: powerType, instID: string ): Promise<debugEnum>
+    static async removePowers (userID: string, type: string, power: powerType, instID: string ): Promise<debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)
@@ -107,7 +106,24 @@ export class AdminDB{
         }
     }
 
-    static async assignCourses (userID: string, type: userType, courses : Array<string>, instID: string): Promise<debugEnum>
+    // Change curSem courses, dertegister from old cursem courses mentioned.
+    // Deregisters only from the courses mentioned in the curSem.
+    static async assignCoursesToStudent (userID: string, type: string, courses : Array<string>, instID: string): Promise<debugEnum>
+    {
+        const data = await Central.getUser(userID, type, instID);
+        if (data.message !== debugEnum.SUCCESS)
+        {
+            return data.message;
+        }
+        else 
+        {
+            await data.col!.updateOne({_id : new ObjectId(userID)}, {$set : {courses : courses}});
+            return debugEnum.SUCCESS;
+        }
+    }
+
+    // Deregister from old courses.
+    static async assignCoutsesToFaculty (userID: string, type: string, courses : Array<string>, instID: string): Promise<debugEnum>
     {
         const data = await Central.getUser(userID, type, instID);
         if (data.message !== debugEnum.SUCCESS)

@@ -120,15 +120,3 @@ app.post('/remove-powers', async (req : Request, res : Response) =>
         return res.status(401).json({ message: 'You do not have the required permissions.' });
     }
 });
-
-app.post('/edit-attendance', async (req : Request, res : Response) =>
-{
-    if (req.session!.powers.includes(powerType.EDIT_ATTENDANCE))
-    {
-        
-    }
-    else 
-    {
-        return res.status(401).json({ message: 'You do not have the required permissions.' });
-    }
-});
