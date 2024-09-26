@@ -6,7 +6,7 @@ import AdminLogin from "./pages/SuperAdmin/AdminLogin";
 import AdminLayout from "./pages/SuperAdmin/AdminLayout";
 import AdminDashboard from "./pages/SuperAdmin/AdminDashboard";
 import StudentTimetable from "./pages/Student/StudentTimetable";
-import StudentLayout from "./pages/Student/StudentLayout";
+import Layout from "./pages/StudentLayout";
 import StudentAlmanac from "./pages/Student/StudentAlmanac";
 import Attendance from "./pages/Student/Attendance";
 import StudentDocVault from "./pages/Student/StudentDocVault";
@@ -15,6 +15,7 @@ import EditUser from "./pages/SuperAdmin/EditUser";
 import AddUserCurr from "./pages/SuperAdmin/AddUserCurr";
 import Users from "./pages/SuperAdmin/Users";
 import Error404 from "./pages/Error-404";
+import ExcelEditor from "./components/ExcelSheet";
 
 function App() {
   // const [isDarkMode, setIsDarkMode] = useState(false);
@@ -31,12 +32,15 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/admin/login" element={<AdminLogin />}></Route>
-        <Route path="/student" element={<StudentLayout />}>
+        <Route path="/student" element={<Layout />}>
           <Route path="dashboard" element={<StudentDashboard />} />
           <Route path="attendance" element={<Attendance />} />
           <Route path="docvault" element={<StudentDocVault />} />
           <Route path="timetable" element={<StudentTimetable />} />
           <Route path="almanac" element={<StudentAlmanac />} />
+        </Route>
+        <Route path="/faculty" element={<Layout />}>
+          <Route path="attendance" element={<ExcelEditor />} />
         </Route>
         <Route path="/test" element={<Error404 />} />
         <Route path="/admin" element={<AdminLayout />}>

@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import SidebarItem from "./SidebarItem";
 import { student as StudentItems } from "../Constants/Student.js";
-import { sidebarContext } from "../pages/Student/StudentLayout.jsx";
+import { sidebarContext } from "../pages/StudentLayout.jsx";
 import { useLocation } from "react-router-dom";
 
 function Sidebar() {

@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { sidebarContext } from "../pages/Student/StudentLayout";
+import { sidebarContext } from "../pages/StudentLayout";
 import { useNavigate } from "react-router-dom";
 
 function SidebarItem({ icon, text, active, alert }) {
