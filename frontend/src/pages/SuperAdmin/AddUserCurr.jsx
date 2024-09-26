@@ -7,7 +7,6 @@ function AddUserCurr() {
   const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
   const [userType, setUserType] = useState("");
-  const [instID, setInstID] = useState("");
   const [message, setMessage] = useState("");
   const [file, setFile] = useState(null); // State for the uploaded file
 
@@ -23,7 +22,6 @@ function AddUserCurr() {
           userID,
           password,
           userType,
-          instID,
         }
       );
       setMessage(response.data.message); // Success message
@@ -35,7 +33,6 @@ function AddUserCurr() {
       setUserID("");
       setPassword("");
       setUserType("");
-      setInstID("");
     }
   };
 
@@ -126,22 +123,6 @@ function AddUserCurr() {
             id="userType"
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
-            required
-            className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-        </div>
-        <div className="mb-4">
-          <label
-            htmlFor="instID"
-            className="block mb-1 text-gray-700 font-semibold"
-          >
-            Institution ID:
-          </label>
-          <input
-            type="text"
-            id="instID"
-            value={instID}
-            onChange={(e) => setInstID(e.target.value)}
             required
             className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
