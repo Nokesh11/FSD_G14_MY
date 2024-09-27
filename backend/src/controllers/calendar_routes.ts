@@ -6,7 +6,7 @@ export const app = Router();
 
 app.post('/edit-event', async (req, res) => 
 {
-    if (req.session!.authorized === true )
+    if (req.session!.authenticated === true )
     {
         const instID = req.session!.instID;
         const { events, date } = req.body;
@@ -28,7 +28,7 @@ app.post('/edit-event', async (req, res) =>
 
 app.get('/get-events', async (req, res) => 
 {
-    if (req.session!.authorized === true)
+    if (req.session!.authenticated === true)
     {
         const instID = req.session!.instID;
         const userID = req.session!.userID;

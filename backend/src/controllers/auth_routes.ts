@@ -34,7 +34,6 @@ app.post('/verify-creds', async (req , res) =>
     }
     else 
     {
-        console.log(result.message);
         req.session!.authenticated = false;
         return res.status(401).json({ message: 'Invalid credentials.' });
     }
