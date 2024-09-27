@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/LoginForm.css';
 import '../App.css';
 import axios from "axios";
 import { useNavigate } from 'react-router-dom';
+
 
 const validateUsername = (username, isAdmin = false) => {
   if (!username) return "Username is required";
@@ -27,6 +28,38 @@ export default function LoginForm() {
   const [error, setError] = useState("");
   const [usernameClass, setUsernameClass] = useState('input-box');
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      const token = localStorage.getItem("token");
+      const userID = localStorage.getItem("userID");
+      const instID = localStorage.getItem("instID");
+
+      if (token && userID && instID) {
+        try {
+          const response = await axios.post(
+            `${process.env.REACT_APP_BASE_URL}/auth/verify-token`,
+            {
+              token,
+              userID,
+              instID,
+              type: "admin",
+            }
+          );
+          if (response.status === 200) {
+            const role = localStorage.getItem("role");
+            navigate(`/${role}/dashboard`);
+          }else{
+            navigate("/");
+          }
+        } catch (error) {
+            console.error("Token verification failed", error);
+        }
+      }
+    };
+
+    verifyToken();
+  }, [navigate]);
 
   const handleRegisterClick = () => {
     setIsActive(true);
