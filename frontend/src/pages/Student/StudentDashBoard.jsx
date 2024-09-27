@@ -24,17 +24,28 @@ import AddIcon from "@mui/icons-material/Add";
 import AttendanceChart from "../../components/AttendanceChart";
 import dayjs from "dayjs";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import { useLogin } from "../../LoginContext";
 
 function StudentDashboard() {
+  const navigate = useNavigate();
+  const {isAuthenticated} = useLogin();
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [tasks, setTasks] = useState({});
   const [newTask, setNewTask] = useState("");
   const [openDialog, setOpenDialog] = useState(false);
   const [activeTab, setActiveTab] = useState(0); // 0: Classes, 1: Tasks
 
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/");
+    }
+  }, [isAuthenticated, navigate]);
+
   // Get tasks for the selected date
   const selectedDateTasks = tasks[selectedDate.format("YYYY-MM-DD")] || [];
 
+  axios.defaults.withCredentials = true;
   // Handle adding a new task
   const addTask = useCallback(async () => {
     if (!newTask.trim()) return; // Prevent adding empty tasks

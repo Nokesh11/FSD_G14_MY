@@ -34,13 +34,14 @@ function FacultyDashboard() {
 
   const selectedDateTasks = tasks[selectedDate.format("YYYY-MM-DD")] || [];
 
+  axios.defaults.withCredentials = true;
   const addTask = useCallback(async () => {
     if (!newTask.trim()) return; // Prevent adding empty tasks
 
     const date = selectedDate.format("YYYY-MM-DD");
     const currentTasks = tasks[date] || [];
     const updatedTasksForDate = [...currentTasks, newTask];
-
+    
     setTasks((prevTasks) => ({ ...prevTasks, [date]: updatedTasksForDate }));
     setNewTask(""); // Clear input field
     setOpenDialog(false); // Close the dialog

@@ -19,6 +19,7 @@ import ExcelEditor from "./components/ExcelSheet";
 import FacultyDashboard from "./pages/Faculty/FacultyDashboard";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { LoginProvider } from "./LoginContext";
 import CoursesList from "./pages/Student/CoursesList";
 import CoursePage from "./pages/Student/CoursePage";
 
@@ -34,30 +35,32 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/admin/login" element={<AdminLogin />}></Route>
-        <Route path="/student" element={<Layout />}>
-          <Route path="dashboard" element={<StudentDashboard />} />
-          <Route path="attendance" element={<Attendance />} />
-          <Route path="docvault" element={<StudentDocVault />} />
-          <Route path="timetable" element={<StudentTimetable />} />
-          <Route path="almanac" element={<StudentAlmanac />} />
-          <Route path="scores" element={<CoursesList />} />
-          <Route path="scores/:courseid" element={<CoursePage />} />
-        </Route>
-        <Route path="/faculty" element={<Layout />}>
-          <Route path="dashboard" element={<FacultyDashboard />} />
-          <Route path="attendance" element={<ExcelEditor />} />
-        </Route>
-        <Route path="/test" element={<Error404 />} />
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="users/add" element={<AddUserCurr />} />
-          <Route path="users/edit" element={<EditUser />} />
-        </Route>
-      </Routes>
+      <LoginProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/admin/login" element={<AdminLogin />}></Route>
+          <Route path="/student" element={<Layout />}>
+            <Route path="dashboard" element={<StudentDashboard />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="docvault" element={<StudentDocVault />} />
+            <Route path="timetable" element={<StudentTimetable />} />
+            <Route path="almanac" element={<StudentAlmanac />} />
+            <Route path="scores" element={<CoursesList />} />
+            <Route path="scores/:courseid" element={<CoursePage />} />
+          </Route>
+          <Route path="/faculty" element={<Layout />}>
+            <Route path="dashboard" element={<FacultyDashboard />} />
+            <Route path="attendance" element={<ExcelEditor />} />
+          </Route>
+          <Route path="/test" element={<Error404 />} />
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="users" element={<Users />} />
+            <Route path="users/add" element={<AddUserCurr />} />
+            <Route path="users/edit" element={<EditUser />} />
+          </Route>
+        </Routes>
+      </LoginProvider>
     </Router>
   );
 }
