@@ -1,38 +1,50 @@
 import React from "react";
 import { useTable } from "react-table";
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, IconButton } from "@mui/material";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  TextField,
+  IconButton,
+} from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
 // Ticket data creation function
-function createTicketData(serial, status, description, recipient) {
-  return { serial, status, description, recipient };
+function createTicketData(serial, status, title, description, recipient) {
+  return { serial, status, title, description, recipient };
 }
 
 // Initial pending and completed ticket rows
 const initialPendingRows = [
-  createTicketData(1, "Open", "Issue with login", "John Doe"),
-  createTicketData(2, "In Progress", "Unable to reset password", "Jane Smith"),
-  createTicketData(4, "Open", "Feature request for new dashboard", "Bob Lee"),
-  createTicketData(6, "Open", "Performance issue in dashboard", "David Lee"),
-  createTicketData(7, "In Progress", "Login issue in mobile app", "Mike Ross"),
+  createTicketData(1, "Open", "Login Issue", "Issue with login on the website", "John Doe"),
+  createTicketData(2, "In Progress", "Password Reset Problem", "Unable to reset password from the profile page", "Jane Smith"),
+  createTicketData(4, "Open", "Feature Request", "Request for a new dashboard layout for better performance", "Bob Lee"),
+  createTicketData(6, "Open", "Performance Issue", "Dashboard is lagging when using on mobile devices", "David Lee"),
+  createTicketData(7, "In Progress", "App Login Issue", "Users facing login issues specifically in the mobile app", "Mike Ross"),
 ];
 
 const completedRows = [
-  createTicketData(3, "Closed", "Bug in payment gateway", "Alice Johnson"),
-  createTicketData(5, "Resolved", "UI glitch on homepage", "Charlie Brown"),
-  createTicketData(8, "Resolved", "Performance optimization", "Daniel James"),
-  createTicketData(9, "Resolved", "Code optimization", "Charlie James"),
+  createTicketData(3, "Closed", "Payment Gateway Bug", "Critical issue in the payment gateway during transactions", "Alice Johnson"),
+  createTicketData(5, "Resolved", "UI Glitch", "UI glitch observed on homepage during user interactions", "Charlie Brown"),
+  createTicketData(8, "Resolved", "Performance Optimization", "Performance issues optimized successfully", "Daniel James"),
+  createTicketData(9, "Resolved", "Code Optimization", "Redundant code removed and refactored for better speed", "Charlie James"),
 ];
 
 const columns = [
   {
     Header: "Serial Number",
-    accessor: "serial", // accessor is the "key" in the data
+    accessor: "serial",
   },
   {
     Header: "Status",
     accessor: "status",
+  },
+  {
+    Header: "Title",
+    accessor: "title",
   },
   {
     Header: "Description",
@@ -47,46 +59,42 @@ const columns = [
 // Main component with tabs and new ticket functionality
 export default function TicketTable() {
   const [tabIndex, setTabIndex] = React.useState(0);
-  const [pendingRows, setPendingRows] = React.useState(initialPendingRows); // State for pending tickets
-  const [openDialog, setOpenDialog] = React.useState(false); // State to manage dialog open/close
+  const [pendingRows, setPendingRows] = React.useState(initialPendingRows);
+  const [openDialog, setOpenDialog] = React.useState(false);
   const [newTicket, setNewTicket] = React.useState({
+    title: "",
     description: "",
     recipient: "",
-  }); // State for new ticket input
+  });
 
-  // Media query to detect small screen
   const isSmallScreen = useMediaQuery("(max-width:730px)");
 
-  // Handle tab change
   const handleTabChange = (index) => {
     setTabIndex(index);
   };
 
-  // Handle form input change
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setNewTicket((prevTicket) => ({ ...prevTicket, [name]: value }));
   };
 
-  // Handle form submission
   const handleSubmit = () => {
     const newSerial = pendingRows.length + completedRows.length + 1;
     const newTicketData = createTicketData(
       newSerial,
       "Open",
+      newTicket.title,
       newTicket.description,
       newTicket.recipient
     );
-    setPendingRows([...pendingRows, newTicketData]); // Add new ticket to pending rows
-    setOpenDialog(false); // Close dialog
-    setNewTicket({ description: "", recipient: "" }); // Reset form
+    setPendingRows([...pendingRows, newTicketData]);
+    setOpenDialog(false);
+    setNewTicket({ title: "", description: "", recipient: "" });
   };
 
-  // Open and close dialog
   const handleOpenDialog = () => setOpenDialog(true);
   const handleCloseDialog = () => setOpenDialog(false);
 
-  // Table component using useTable hook
   const TableComponent = ({ data }) => {
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable({
       columns,
@@ -96,9 +104,9 @@ export default function TicketTable() {
     return (
       <table {...getTableProps()} style={{ width: "100%", borderCollapse: "collapse" }}>
         <thead>
-          {headerGroups.map(headerGroup => (
+          {headerGroups.map((headerGroup) => (
             <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map(column => (
+              {headerGroup.headers.map((column) => (
                 <th
                   {...column.getHeaderProps()}
                   style={{
@@ -116,11 +124,11 @@ export default function TicketTable() {
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map(row => {
+          {rows.map((row) => {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
-                {row.cells.map(cell => {
+                {row.cells.map((cell) => {
                   return (
                     <td
                       {...cell.getCellProps()}
@@ -144,24 +152,21 @@ export default function TicketTable() {
 
   return (
     <div style={styles.card}>
-      {/* New Ticket Button */}
       {isSmallScreen ? (
-        // Use IconButton with plus icon for small screens
         <IconButton
           onClick={handleOpenDialog}
           sx={{
             position: "absolute",
             top: "10px",
             right: "10px",
-            zIndex: 1000, // Ensures it's above other elements
-            backgroundColor: "#904dd3", // Custom background color (purple)
-            color: "#fff", // Custom icon color (white)
+            zIndex: 1000,
+            backgroundColor: "#904dd3",
+            color: "#fff",
           }}
         >
           <AddIcon />
         </IconButton>
       ) : (
-        // Full button for larger screens
         <Button
           variant="contained"
           onClick={handleOpenDialog}
@@ -169,26 +174,36 @@ export default function TicketTable() {
             position: "absolute",
             top: "10px",
             right: "10px",
-            zIndex: 1000, // Ensures it's above other elements
-            backgroundColor: "#904dd3", // Custom background color (purple)
-            color: "#fff", // Custom text color (white)
-            borderRadius: "5px", // Example: custom border radius
+            zIndex: 1000,
+            backgroundColor: "#904dd3",
+            color: "#fff",
+            borderRadius: "5px",
           }}
         >
           Add New Ticket
         </Button>
       )}
 
-      {/* Dialog for adding new ticket */}
       <Dialog open={openDialog} onClose={handleCloseDialog}>
         <DialogTitle>Add New Ticket</DialogTitle>
         <DialogContent>
           <TextField
             autoFocus
             margin="dense"
+            label="Title"
+            type="text"
+            fullWidth
+            name="title"
+            value={newTicket.title}
+            onChange={handleInputChange}
+          />
+          <TextField
+            margin="dense"
             label="Description"
             type="text"
             fullWidth
+            multiline
+            rows={4} // Number of rows for multiline text
             name="description"
             value={newTicket.description}
             onChange={handleInputChange}
@@ -213,7 +228,6 @@ export default function TicketTable() {
         </DialogActions>
       </Dialog>
 
-      {/* Render Tabs */}
       <div>
         <Button
           onClick={() => handleTabChange(0)}
@@ -236,14 +250,12 @@ export default function TicketTable() {
         </Button>
       </div>
 
-      {/* Render Table based on tab index */}
       {tabIndex === 0 && <TableComponent data={pendingRows} />}
       {tabIndex === 1 && <TableComponent data={completedRows} />}
     </div>
   );
 }
 
-// Styles for card
 const styles = {
   card: {
     width: "100%",
