@@ -54,7 +54,7 @@ export default function LoginForm() {
       const formattedData = {
         userID: data.username,
         password: data.password,
-        userType: role,
+        type: role,
         instID: data.instituteId
       }
       const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/auth/verify-creds`, formattedData);

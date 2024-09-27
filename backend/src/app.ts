@@ -25,6 +25,7 @@ import { admin_type, powerType } from './shared';
 // })
 Central.init().then(() => {
   // console.log("DB CONNECTED");
+  // AdminDB.createUser("0000", "420420", admin_type, "IIITS");
   // AdminDB.givePowers("6969", admin_type, "IIITS", powerType.VIEW_POWERS);
   // AdminDB.createUser("6969","420420", admin_type, "IIITS");
 })

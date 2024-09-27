@@ -28,7 +28,7 @@ export class AdminDB{
         if (data.message === debugEnum.INVALID_USER_ID)
         {
             const passHash = AuthDB.hash(password);
-            await data.col!.insertOne({_id : userID, passHash : passHash, powers : [], courses : [], curSem : 1, active_tickets : [], resolved_tickets : []} as Condition<ObjectId>);
+            await data.col!.insertOne({_id : userID, passHash : passHash, powers : [], courses : [], curSem : 1, active_tickets : [], resolved_tickets : [], tasks : []} as Condition<ObjectId>);
             return debugEnum.SUCCESS;
         }
         else 
