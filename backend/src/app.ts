@@ -10,6 +10,8 @@ import cookieParser from "cookie-parser";
 import { app as authRouter } from './controllers/auth_routes';
 import { app as adminRouter } from './controllers/admin_routes';
 import { app as courseRouter } from './controllers/course_routes';
+import { app as ticketRouter } from './controllers/ticket_routes';
+import { app as calendarRouter } from './controllers/calendar_routes';
 
 import { Central } from './models/central_db';
 import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS, PORT, SECRET } from './config';
@@ -57,6 +59,7 @@ app.use(session({secret : SECRET, "saveUninitialized" : false,
 app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/course', courseRouter);
+app.use('/calendar', calendarRouter);
 
 app.get('/', (req, res) => {
   res.send('Server is up and running');
