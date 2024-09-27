@@ -1,4 +1,5 @@
 import React from "react";
+import axios from "axios";
 import { useTable } from "react-table";
 import {
   Button,
@@ -12,25 +13,18 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
-// Ticket data creation function
 function createTicketData(serial, status, title, description, recipient) {
   return { serial, status, title, description, recipient };
 }
 
-// Initial pending and completed ticket rows
 const initialPendingRows = [
   createTicketData(1, "Open", "Login Issue", "Issue with login on the website", "John Doe"),
   createTicketData(2, "In Progress", "Password Reset Problem", "Unable to reset password from the profile page", "Jane Smith"),
   createTicketData(4, "Open", "Feature Request", "Request for a new dashboard layout for better performance", "Bob Lee"),
-  createTicketData(6, "Open", "Performance Issue", "Dashboard is lagging when using on mobile devices", "David Lee"),
-  createTicketData(7, "In Progress", "App Login Issue", "Users facing login issues specifically in the mobile app", "Mike Ross"),
 ];
 
 const completedRows = [
   createTicketData(3, "Closed", "Payment Gateway Bug", "Critical issue in the payment gateway during transactions", "Alice Johnson"),
-  createTicketData(5, "Resolved", "UI Glitch", "UI glitch observed on homepage during user interactions", "Charlie Brown"),
-  createTicketData(8, "Resolved", "Performance Optimization", "Performance issues optimized successfully", "Daniel James"),
-  createTicketData(9, "Resolved", "Code Optimization", "Redundant code removed and refactored for better speed", "Charlie James"),
 ];
 
 const columns = [
@@ -56,7 +50,6 @@ const columns = [
   },
 ];
 
-// Main component with tabs and new ticket functionality
 export default function TicketTable() {
   const [tabIndex, setTabIndex] = React.useState(0);
   const [pendingRows, setPendingRows] = React.useState(initialPendingRows);
@@ -78,18 +71,27 @@ export default function TicketTable() {
     setNewTicket((prevTicket) => ({ ...prevTicket, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    const newSerial = pendingRows.length + completedRows.length + 1;
-    const newTicketData = createTicketData(
-      newSerial,
-      "Open",
-      newTicket.title,
-      newTicket.description,
-      newTicket.recipient
-    );
-    setPendingRows([...pendingRows, newTicketData]);
-    setOpenDialog(false);
-    setNewTicket({ title: "", description: "", recipient: "" });
+  // Updated handleSubmit function with axios POST request to database
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("/tickets/create-ticket", newTicket);
+
+      // After successful POST request, update the pendingRows state with the new ticket
+      const newSerial = pendingRows.length + completedRows.length + 1;
+      const newTicketData = createTicketData(
+        newSerial,
+        "Open",
+        response.data.title,
+        response.data.description,
+        response.data.recipient
+      );
+
+      setPendingRows([...pendingRows, newTicketData]);
+      setOpenDialog(false);
+      setNewTicket({ title: "", description: "", recipient: "" });
+    } catch (error) {
+      console.error("Error adding new ticket:", error);
+    }
   };
 
   const handleOpenDialog = () => setOpenDialog(true);
@@ -128,20 +130,18 @@ export default function TicketTable() {
             prepareRow(row);
             return (
               <tr {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      {...cell.getCellProps()}
-                      style={{
-                        padding: "10px",
-                        borderBottom: "1px solid #ddd",
-                        color: "black",
-                      }}
-                    >
-                      {cell.render("Cell")}
-                    </td>
-                  );
-                })}
+                {row.cells.map((cell) => (
+                  <td
+                    {...cell.getCellProps()}
+                    style={{
+                      padding: "10px",
+                      borderBottom: "1px solid #ddd",
+                      color: "black",
+                    }}
+                  >
+                    {cell.render("Cell")}
+                  </td>
+                ))}
               </tr>
             );
           })}
@@ -203,7 +203,7 @@ export default function TicketTable() {
             type="text"
             fullWidth
             multiline
-            rows={4} // Number of rows for multiline text
+            rows={4}
             name="description"
             value={newTicket.description}
             onChange={handleInputChange}
@@ -264,6 +264,6 @@ const styles = {
     padding: "20px",
     boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
     borderRadius: "10px",
-    backgroundImage: "linear-gradient(to bottom, #ffffff, #f0f0f0)",
+    backgroundImage: "linear",
   },
 };
