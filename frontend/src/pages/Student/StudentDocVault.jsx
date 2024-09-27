@@ -1,10 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../LoginContext";
 
 function StudentDocVault() {
   const navigate = useNavigate();
-  const {isAuthenticated} = useLogin();
+  const { isAuthenticated } = useLogin();
 
   useEffect(() => {
     if (!isAuthenticated) {

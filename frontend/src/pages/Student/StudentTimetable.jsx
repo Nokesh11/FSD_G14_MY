@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import PDFViewer from '../../components/TimeTableViewer';
 import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../LoginContext";

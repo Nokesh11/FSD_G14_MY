@@ -1,5 +1,5 @@
 // src/CoursesList.js
-import React from "react";
+import { React, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Grid,
@@ -10,7 +10,6 @@ import {
     Box,
     styled,
 } from "@mui/material";
-import { useNavigate } from "react-router-dom";
 import { useLogin } from "../../LoginContext";
 
 // Sample course data
