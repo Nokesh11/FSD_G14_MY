@@ -103,7 +103,7 @@ app.post('/remove-powers', async (req : Request, res : Response) =>
     {
         const instID = req.session!.instID;
         const { userID, power, type } = req.body;
-        const result = await AdminDB.removePowers(userID, type, instID, power);
+        const result = await AdminDB.removePowers(userID, type, power, instID);
         if (result === debugEnum.SUCCESS)
         {
             return res.status(200).json({ message: 'Powers removed successfully.' });
