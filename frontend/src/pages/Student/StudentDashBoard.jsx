@@ -1,3 +1,4 @@
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Box,
   Grid,
@@ -15,14 +16,14 @@ import {
   TextField,
   Button,
 } from "@mui/material";
-import { useState } from "react";
 import Calendar from "../../components/Calender";
-import AttendanceChart from "../../components/AttendanceChart";
 import TicketTable from "../../components/TicketTable";
 import AnnouncementsTable from "../../components/Announcements";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
+import AttendanceChart from "../../components/AttendanceChart";
 import dayjs from "dayjs";
+import axios from "axios";
 
 function StudentDashboard() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
@@ -35,23 +36,69 @@ function StudentDashboard() {
   const selectedDateTasks = tasks[selectedDate.format("YYYY-MM-DD")] || [];
 
   // Handle adding a new task
-  const addTask = () => {
+  const addTask = useCallback(async () => {
     if (!newTask.trim()) return; // Prevent adding empty tasks
+
     const date = selectedDate.format("YYYY-MM-DD");
     const currentTasks = tasks[date] || [];
-    setTasks({ ...tasks, [date]: [...currentTasks, newTask] });
+    const updatedTasksForDate = [...currentTasks, newTask];
+
+    setTasks((prevTasks) => ({ ...prevTasks, [date]: updatedTasksForDate }));
     setNewTask(""); // Clear input field
     setOpenDialog(false); // Close the dialog
-  };
 
-  // Handle deleting a task
-  const removeTask = (indexToRemove) => {
-    const date = selectedDate.format("YYYY-MM-DD");
-    const updatedTasks = tasks[date].filter(
-      (_, index) => index !== indexToRemove
-    );
-    setTasks({ ...tasks, [date]: updatedTasks });
-  };
+    try {
+      await axios.post(
+        `${process.env.REACT_APP_BASE_URL}/calendar/edit-event`,
+        {
+          date,
+          events: updatedTasksForDate,
+        }
+      );
+    } catch (error) {
+      console.error("Failed to update tasks", error);
+    }
+  }, [newTask, selectedDate, tasks]); // Dependencies
+
+  // Handle deleting a task, wrapped in useCallback to avoid re-creation
+  const removeTask = useCallback(
+    async (indexToRemove) => {
+      const date = selectedDate.format("YYYY-MM-DD");
+      const updatedTasksForDate = tasks[date].filter(
+        (_, index) => index !== indexToRemove
+      );
+
+      setTasks((prevTasks) => ({ ...prevTasks, [date]: updatedTasksForDate }));
+
+      try {
+        await axios.post(
+          `${process.env.REACT_APP_BASE_URL}/calendar/edit-event`,
+          {
+            date,
+            events: updatedTasksForDate,
+          }
+        );
+      } catch (error) {
+        console.error("Failed to update tasks", error);
+      }
+    },
+    [selectedDate, tasks]
+  ); // Dependencies
+
+  useEffect(() => {
+    const getTasks = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_BASE_URL}/calendar/get-events`
+        );
+        if (response.status === 200) setTasks(response.data.tasks);
+        else setTasks({});
+      } catch {
+        console.error("Failed to fetch tasks");
+      }
+    };
+    getTasks();
+  }, []);
 
   // Handle changing selected date
   const handleDateChange = (date) => {
