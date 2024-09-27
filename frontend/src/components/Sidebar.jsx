@@ -1,10 +1,9 @@
 import React, { useContext } from "react";
 import SidebarItem from "./SidebarItem";
-import { student as StudentItems } from "../Constants/Student.js";
 import { sidebarContext } from "../pages/StudentLayout.jsx";
 import { useLocation } from "react-router-dom";
 
-function Sidebar() {
+function Sidebar({ array }) {
   const { expanded, isMobile } = useContext(sidebarContext);
   const location = useLocation();
   const currPage = location.pathname.split("/").pop();
@@ -17,7 +16,7 @@ function Sidebar() {
     >
       <nav className="h-full flex flex-col bg-white border-r shadow-sm">
         <ul className="flex-1 px-3 my-1 text-black">
-          {StudentItems.map((item, index) => (
+          {array.map((item, index) => (
             <SidebarItem
               key={index}
               icon={item.icon}

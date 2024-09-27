@@ -3,13 +3,15 @@ import { useState, createContext } from "react";
 import Appbar from "../components/Appbar";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
+import { student } from "../Constants/Student";
+import { faculty } from "../Constants/Faculty";
 
 export const sidebarContext = createContext();
 
 function StudentLayout() {
   const [expanded, setExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-
+  const role = localStorage.getItem("role");
   return (
     <Box
       sx={{
@@ -25,7 +27,7 @@ function StudentLayout() {
         <Appbar />
         <Box sx={{ display: "flex", flex: 1, height: "calc(100vh - 64px)" }}>
           <Box maxWidth="200px">
-            <Sidebar />
+            <Sidebar array={role === "student" ? student : faculty} />
           </Box>
           <Box
             sx={{
@@ -35,7 +37,6 @@ function StudentLayout() {
               padding: 3,
               overflow: "auto",
               bgcolor: "white",
-              
             }}
           >
             <Outlet />
