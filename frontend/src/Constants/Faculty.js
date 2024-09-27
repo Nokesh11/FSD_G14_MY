@@ -1,6 +1,6 @@
 import { Home, Calendar, FileText, Clock, Book, Percent, TicketMinus } from 'lucide-react';
 
-export const student = [
+export const faculty = [
     { icon: <Home />, text: "Dashboard", path: "dashboard" },
     // { icon: <Calendar />, text: "Attendance", path: "attendance" },
     { icon: <TicketMinus />, text: "Pending Ticket", path: "resolve_tickets" },
