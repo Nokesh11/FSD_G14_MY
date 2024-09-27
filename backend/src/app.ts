@@ -18,16 +18,18 @@ import { COOKIE_MAX_AGE, COOKIE_SESSION_KEYS, PORT, SECRET } from './config';
 
 
 import { AdminDB } from './models/admin_db';
-import { admin_type, powerType } from './shared';
+import { admin_type, powerType, student_type } from './shared';
 
 // Central.init().then(() => {
 //   console.log("DB initialized");
 // })
-Central.init().then(() => {
-  // console.log("DB CONNECTED");
-  // AdminDB.createUser("0000", "420420", admin_type, "IIITS");
-  // AdminDB.givePowers("6969", admin_type, "IIITS", powerType.VIEW_POWERS);
-  // AdminDB.createUser("6969","420420", admin_type, "IIITS");
+Central.init().then(async () => {
+  // await Central.createInst("IIITS");
+  // await AdminDB.createUser("6969", "420420", admin_type, "IIITS");
+  // await AdminDB.givePowers("6969", admin_type, "IIITS", powerType.EDIT_POWERS);
+  // await AdminDB.givePowers("6969", admin_type, "IIITS", powerType.VIEW_POWERS);
+  // await AdminDB.givePowers("6969", admin_type, "IIITS", powerType.CREATE_USER);
+  // await AdminDB.createUser('9696', '420420', student_type, 'IIITS');
 })
 
 const app = express();

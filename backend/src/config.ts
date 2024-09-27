@@ -9,5 +9,6 @@ export const TOKEN_LENGTH = 256;
 export const SALTING_ROUNDS = 10;
 export const SALT = "The salt is salty";
 
-export const MONGO_URL = 'mongodb://127.0.0.1:27017';
+// export const MONGO_URL = 'mongodb://127.0.0.1:27017';
+export const MONGO_URL = 'mongodb+srv://FDFED:FDFED_430430@cluster0.fq19v.mongodb.net/'
 export const SECRET = 'THIS IS A SECRET I"M BORED';
