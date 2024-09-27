@@ -61,6 +61,8 @@ export default function LoginForm() {
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         localStorage.setItem('role', role);
+        localStorage.setItem('instituteId', data.instID);
+        localStorage.setItem('userID', data.userID);
         if (role === "faculty") navigate("/faculty/dashboard");
         if (role === "student") navigate("/student/dashboard");
       } else {

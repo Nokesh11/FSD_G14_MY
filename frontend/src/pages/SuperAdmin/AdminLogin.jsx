@@ -23,7 +23,7 @@ const AdminLogin = () => {
               token,
               userID,
               instID,
-              userType: "admin",
+              type: "admin",
             }
           );
           if (response.status === 200) {
