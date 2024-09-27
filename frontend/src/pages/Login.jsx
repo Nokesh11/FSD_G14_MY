@@ -97,7 +97,7 @@ export default function LoginForm() {
         localStorage.setItem('role', userRole);
         localStorage.setItem('instID', data.instituteId);
         localStorage.setItem('userID', data.username);
-        if (role === "faculty") navigate("/faculty/dashboard");
+        if (role === "admin") navigate("/faculty/dashboard");
         else if (role === "student") navigate("/student/dashboard");
       } else {
         setError(response.data.message);
