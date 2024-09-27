@@ -62,8 +62,8 @@ export default function LoginForm() {
         localStorage.setItem('token', response.data.token);
         const userRole = role === 'admin' ? 'faculty' : 'student';
         localStorage.setItem('role', userRole);
-        localStorage.setItem('instituteId', data.instID);
-        localStorage.setItem('userID', data.userID);
+        localStorage.setItem('instID', data.instituteId);
+        localStorage.setItem('userID', data.username);
         if (role === "faculty") navigate("/faculty/dashboard");
         if (role === "student") navigate("/student/dashboard");
       } else {
