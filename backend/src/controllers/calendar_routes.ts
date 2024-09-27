@@ -10,6 +10,7 @@ app.post('/edit-event', async (req, res) =>
     {
         const instID = req.session!.instID;
         const { events, date } = req.body;
+        console.log(events, date);
         const userID = req.session!.userID;
         const type = req.session!.type;
         const result = await Central.getUser(userID, type, instID);
@@ -20,7 +21,12 @@ app.post('/edit-event', async (req, res) =>
         const col = result.col;
         let tasks = result.user!.tasks;
         tasks[date] = events;
-        col!.updateOne({_id : userID},{tasks : tasks});
+        if (tasks[date].length === 0)
+        {
+            delete tasks[date];
+        }
+        console.log(tasks);
+        col!.updateOne({_id : userID},{$set : {tasks : tasks}});
         return res.status(200).send({message : result.message});
     }
     return res.status(401).send({message : "Unauthorized"});
