@@ -74,7 +74,7 @@ export default function TicketTable() {
   // Updated handleSubmit function with axios POST request to database
   const handleSubmit = async () => {
     try {
-      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/ticket/create-ticket`, newTicket);
+      const response = await axios.post(`${process.env.REACT_APP_BASE_URL}/ticket/create-ticket`, {body: newTicket.description, toID: newTicket.recipient, title: newTicket.title});
 
       // After successful POST request, update the pendingRows state with the new ticket
       const newSerial = pendingRows.length + completedRows.length + 1;
