@@ -1,4 +1,4 @@
-import { Home, Calendar, FileText, Clock, Book, Percent, TicketMinus } from 'lucide-react';
+import { Home, FileText, Clock, Book, Percent, TicketMinus } from 'lucide-react';
 
 export const faculty = [
     { icon: <Home />, text: "Dashboard", path: "dashboard" },
