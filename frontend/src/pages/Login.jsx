@@ -34,6 +34,7 @@ export default function LoginForm() {
       const token = localStorage.getItem("token");
       const userID = localStorage.getItem("userID");
       const instID = localStorage.getItem("instID");
+      const type = localStorage.getItem("type");
 
       if (token && userID && instID) {
         try {
@@ -43,12 +44,13 @@ export default function LoginForm() {
               token,
               userID,
               instID,
-              type: "admin",
+              type,
             }
           );
           if (response.status === 200) {
-            const role = localStorage.getItem("role");
-            navigate(`/${role}/dashboard`);
+            const role = localStorage.getItem("type");
+            if(role === "admin") navigate("/faculty/dashboard");
+            else navigate(`/student/dashboard`);
           }else{
             navigate("/");
           }
@@ -94,7 +96,7 @@ export default function LoginForm() {
       if (response.status === 200) {
         localStorage.setItem('token', response.data.token);
         const userRole = role === 'admin' ? 'faculty' : 'student';
-        localStorage.setItem('role', userRole);
+        localStorage.setItem('type', userRole);
         localStorage.setItem('instID', data.instituteId);
         localStorage.setItem('userID', data.username);
         if (role === "admin") navigate("/faculty/dashboard");
