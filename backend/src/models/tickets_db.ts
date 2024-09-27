@@ -1,4 +1,4 @@
-import { ObjectId, Condition} from 'mongodb';
+import { ObjectId, Condition, Collection, OptionalId} from 'mongodb';
 import { Central } from './central_db';
 import { debugEnum } from '../shared';
 
@@ -63,7 +63,7 @@ export class TicketDB
         }
     }
 
-    private static genTicketID (fromID : string, toID : string)
+    public static genTicketID (fromID : string, toID : string)
     {
         const now = new Date();
         const timeStamp = `${now.getMonth() + 1}.${now.getDate()}.${now.getFullYear()}-${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
