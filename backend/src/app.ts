@@ -60,6 +60,7 @@ app.use('/auth', authRouter);
 app.use('/admin', adminRouter);
 app.use('/course', courseRouter);
 app.use('/calendar', calendarRouter);
+app.use('/ticket', ticketRouter);
 
 app.get('/', (req, res) => {
   res.send('Server is up and running');
