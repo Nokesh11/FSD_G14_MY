@@ -78,7 +78,7 @@ const AdminLogin = () => {
         );
         if (response.status === 200) {
           localStorage.setItem("token", response.data.token);
-          localStorage.setItem("role", "superadmin");
+          localStorage.setItem("role", "admin");
           localStorage.setItem("userID", userID);
           localStorage.setItem("instID", institute_ID);
           navigate("/admin/dashboard");

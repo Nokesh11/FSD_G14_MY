@@ -4,20 +4,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { Container, Typography, Box } from "@mui/material";
 import CoursesList from "./CoursesList";
 import CoursePage from "./CoursePage";
-import { useNavigate } from "react-router-dom";
-import { useLogin } from "../../LoginContext";
 
 function Scores() {
-
-    const navigate = useNavigate();
-    const { isAuthenticated } = useLogin();
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/");
-        }
-    }, [isAuthenticated, navigate]);
-
     return (
         <Router>
             <Container sx={{ padding: "20px" }}>

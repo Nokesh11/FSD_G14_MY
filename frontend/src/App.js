@@ -4,13 +4,13 @@ import StudentDashboard from "./pages/Student/StudentDashBoard";
 import Login from "./pages/Login";
 import AdminLogin from "./pages/SuperAdmin/AdminLogin";
 import AdminLayout from "./pages/SuperAdmin/AdminLayout";
-import AdminDashboard from "./pages/SuperAdmin/AdminDashboard";
 import StudentTimetable from "./pages/Student/StudentTimetable";
 import Layout from "./pages/StudentLayout";
 import StudentAlmanac from "./pages/Student/StudentAlmanac";
 import Attendance from "./pages/Student/Attendance";
 import StudentDocVault from "./pages/Student/StudentDocVault";
 // import AddUser from "./pages/SuperAdmin/AddUser";
+import AdminDashboard from "./pages/SuperAdmin/AdminDashboard";
 import EditUser from "./pages/SuperAdmin/EditUser";
 import AddUserCurr from "./pages/SuperAdmin/AddUserCurr";
 import Users from "./pages/SuperAdmin/Users";
@@ -22,6 +22,9 @@ import "slick-carousel/slick/slick-theme.css";
 import { LoginProvider } from "./LoginContext";
 import CoursesList from "./pages/Student/CoursesList";
 import CoursePage from "./pages/Student/CoursePage";
+import ProtectedRoute from "./ProtectedRoute";
+import Unauthorized from "./pages/Unauthorized";
+
 
 function App() {
   return (
@@ -30,20 +33,34 @@ function App() {
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/admin/login" element={<AdminLogin />} />
-          
+
           {/* Admin Routes */}
-          <Route path="/admin/*" element={<AdminLayout />}>
+          <Route
+            path="/admin/*"
+            element={
+              <ProtectedRoute
+                element={<AdminLayout />}
+                requiredRole="admin"
+              />
+            }
+          >
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="users" element={<Users />} />
             <Route path="users/add" element={<AddUserCurr />} />
             <Route path="users/edit" element={<EditUser />} />
-            {/* Catch-all for /admin */}
-            <Route path="" element={<Error404 />} /> {/* Handles /admin */}
-            <Route path="*" element={<Error404 />} /> {/* Handles other unmatched paths */}
+            <Route path="*" element={<Error404 />} />
           </Route>
 
           {/* Student Routes */}
-          <Route path="/student/*" element={<Layout />}>
+          <Route
+            path="/student/*"
+            element={
+              <ProtectedRoute
+                element={<Layout />}
+                requiredRole="student"
+              />
+            }
+          >
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="docvault" element={<StudentDocVault />} />
@@ -51,30 +68,31 @@ function App() {
             <Route path="almanac" element={<StudentAlmanac />} />
             <Route path="scores" element={<CoursesList />} />
             <Route path="scores/:courseid" element={<CoursePage />} />
-            {/* Catch-all for /student */}
-            <Route path="" element={<Error404 />} /> {/* Handles /student */}
-            <Route path="*" element={<Error404 />} /> {/* Handles other unmatched paths */}
+            <Route path="*" element={<Error404 />} />
           </Route>
 
           {/* Faculty Routes */}
-          <Route path="/faculty/*" element={<Layout />}>
+          <Route
+            path="/faculty/*"
+            element={
+              <ProtectedRoute
+                element={<Layout />}
+                requiredRole="faculty"
+              />
+            }
+          >
             <Route path="dashboard" element={<FacultyDashboard />} />
             <Route path="attendance" element={<ExcelEditor />} />
-            {/* Catch-all for /faculty */}
-            <Route path="" element={<Error404 />} /> {/* Handles /faculty */}
-            <Route path="*" element={<Error404 />} /> {/* Handles other unmatched paths */}
+            <Route path="*" element={<Error404 />} />
           </Route>
 
           {/* Other Routes */}
-          <Route path="/test" element={<Error404 />} />
-          
-          {/* Fallback route for any unmatched paths */}
+          <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<Error404 />} />
         </Routes>
       </LoginProvider>
     </Router>
   );
 }
-
 
 export default App;

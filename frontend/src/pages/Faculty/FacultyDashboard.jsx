@@ -24,26 +24,14 @@ import AddIcon from "@mui/icons-material/Add";
 import dayjs from "dayjs";
 import Courses from "./Courses";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
-import { useLogin } from "../../LoginContext";
-
 
 function FacultyDashboard() {
     const [selectedDate, setSelectedDate] = useState(dayjs());
     const [tasks, setTasks] = useState([]);
     const [newTask, setNewTask] = useState("");
     const [openDialog, setOpenDialog] = useState(false);
-    const [activeTab, setActiveTab] = useState(0); // 0: Classes, 1: Tasks
-    const navigate = useNavigate();
-    const {isAuthenticated} = useLogin();
-
+    const [activeTab, setActiveTab] = useState(0); 
     const selectedDateTasks = tasks[selectedDate.format("YYYY-MM-DD")] || [];
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/");
-        }
-    }, [isAuthenticated, navigate]);
 
     axios.defaults.withCredentials = true;
     const addTask = useCallback(async () => {

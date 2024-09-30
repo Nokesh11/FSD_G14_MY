@@ -1,11 +1,7 @@
-// src/CoursePage.js
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Box, Typography, Paper, List, ListItem, ListItemText } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { useLogin } from "../../LoginContext";
 
-// Sample course data with additional fields for marks
 const courseData = {
     1: {
         title: "Math 101",
@@ -43,9 +39,7 @@ const courseData = {
 
 const CoursePage = () => {
     const { courseid } = useParams();
-    const [course, setCourse] = useState(null); // Initialize with null
-    const navigate = useNavigate();
-    const { isAuthenticated } = useLogin();
+    const [course, setCourse] = useState(null);
 
     useEffect(() => {
         // Simulate a fetch operation with local course data
@@ -56,12 +50,6 @@ const CoursePage = () => {
 
         fetchCourseData();
     }, [courseid]);
-
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/");
-        }
-    }, [isAuthenticated, navigate]);
 
     // Handle loading or error states
     if (!course) {

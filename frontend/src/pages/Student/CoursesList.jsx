@@ -1,5 +1,5 @@
 // src/CoursesList.js
-import { React, useEffect } from "react";
+import { React } from "react";
 import { useNavigate } from "react-router-dom";
 import {
     Grid,
@@ -10,7 +10,6 @@ import {
     Box,
     styled,
 } from "@mui/material";
-import { useLogin } from "../../LoginContext";
 
 // Sample course data
 const courseData = [
@@ -86,13 +85,6 @@ const CoursesList = () => {
     const handleCourseClick = (courseId) => {
         navigate(`/student/scores/${courseId}`); // Ensure the path is correct
     };
-    const { isAuthenticated } = useLogin();
-    useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/");
-        }
-    }, [isAuthenticated, navigate]);
-
 
     return (
         <Box sx={{ padding: "20px" }}>
