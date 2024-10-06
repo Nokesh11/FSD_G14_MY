@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect, useMemo } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 
-const LoginContext = createContext();
+const LoginContext = createContext(null);
 
 export const LoginProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,45 +9,50 @@ export const LoginProvider = ({ children }) => {
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
 
-  // Memoize details to prevent unnecessary re-renders
-  const details = useMemo(() => ({
-    token: localStorage?.getItem("token"),
-    userID: localStorage?.getItem("userID"),
-    type: localStorage?.getItem("type"),
-    instID: localStorage?.getItem("instID"),
-  }), []);
-
   useEffect(() => {
     const checkAuth = async () => {
+      const token = localStorage.getItem("token");
+      const userID = localStorage.getItem("userID");
+      const type = localStorage.getItem("type");
+      const instID = localStorage.getItem("instID");
+
+      if (!token) {
+        // If there's no token, we assume the user is not authenticated
+        setIsAuthenticated(false);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         const response = await axios.post(
           `${process.env.REACT_APP_BASE_URL}/auth/verify-token`,
           {
-            token: details.token,
-            userID: details.userID,
-            type: details.type,
-            instID: details.instID,
+            token,
+            userID,
+            type,
+            instID,
           }
         );
+
         if (response.status === 200) {
+          // Set authentication and user role
           setIsAuthenticated(true);
-          setUserRole(details.type);
+          setUserRole(type);
+        } else {
+          setIsAuthenticated(false);
+          setError("User not authenticated");
         }
       } catch (error) {
         setIsAuthenticated(false);
         setError("User not authenticated");
       } finally {
-        setLoading(false);
+        setLoading(false); // End the loading phase
       }
     };
 
-    if (details.token) {
-      checkAuth();
-    } else {
-      setLoading(false);
-    }
-  }, [details]); 
+    checkAuth();
+  }, [isAuthenticated]); 
 
   return (
     <LoginContext.Provider
@@ -58,6 +63,7 @@ export const LoginProvider = ({ children }) => {
   );
 };
 
+// Custom hook to use the LoginContext
 export const useLogin = () => {
   const context = useContext(LoginContext);
   if (!context) {

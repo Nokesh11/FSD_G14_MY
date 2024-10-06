@@ -11,7 +11,7 @@ export const sidebarContext = createContext();
 function StudentLayout() {
   const [expanded, setExpanded] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
-  const role = localStorage.getItem("role");
+  const role = localStorage.getItem("type");
   return (
     <Box
       sx={{

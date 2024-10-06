@@ -9,12 +9,12 @@ const ProtectedRoute = ({ element, requiredRole }) => {
   }
 
   if (error || !isAuthenticated) {
-    return <Navigate to="/" replace />; 
+    return <Navigate to={"/"}/>
   }
 
   // Check if the required role matches
   if (requiredRole && requiredRole !== userRole) {
-    return <Navigate to="/unauthorized" replace />; 
+    return <Navigate to={"/unauthorized"}/>
   }
 
   return element; // Render the protected component if authenticated and role matches

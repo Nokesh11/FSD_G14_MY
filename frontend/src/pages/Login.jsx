@@ -127,8 +127,8 @@ export default function LoginForm() {
 
         if (response.status === 200) {
           localStorage.setItem("token", response.data.token);
+          localStorage.setItem("type", role);
           const userRole = role === "admin" ? "faculty" : "student";
-          localStorage.setItem("type", userRole);
           localStorage.setItem("instID", data.instituteId);
           localStorage.setItem("userID", data.username);
     

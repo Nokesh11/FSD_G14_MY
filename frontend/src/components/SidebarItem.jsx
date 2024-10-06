@@ -5,14 +5,15 @@ import { useNavigate } from "react-router-dom";
 function SidebarItem({ icon, text, active, alert }) {
   const { expanded } = useContext(sidebarContext);
   const navigate = useNavigate();
-
+  let userRole = localStorage.getItem("type");
+  if(userRole === "admin") userRole = "faculty";
   return (
     <li
       className={`relative flex items-center py-2 px-3 my-1 font-medium rounded-md cursor-pointer transition-colors ${active
         ? "bg-gradient-to-tr bg-primary text-white"
         : "hover:bg-indigo-50 text-gray-600"
         }`}
-        onClick={()=>{navigate(`/student/${text.toLowerCase()}`)}}
+        onClick={()=>{navigate(`/${userRole}/${text.toLowerCase()}`)}}
     >
       <span className={`flex-shrink-0 ${expanded ? "text-lg" : "text-sm"}`}>
         {icon}

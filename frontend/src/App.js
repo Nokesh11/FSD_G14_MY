@@ -77,12 +77,14 @@ function App() {
             element={
               <ProtectedRoute
                 element={<Layout />}
-                requiredRole="faculty"
+                requiredRole="admin"
               />
             }
           >
             <Route path="dashboard" element={<FacultyDashboard />} />
             <Route path="attendance" element={<ExcelEditor />} />
+            <Route path="timetable" element={<StudentTimetable />} />
+            <Route path="almanac" element={<StudentAlmanac />} />
             <Route path="*" element={<Error404 />} />
           </Route>
 
