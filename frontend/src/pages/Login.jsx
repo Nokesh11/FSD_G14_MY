@@ -3,6 +3,7 @@ import "../styles/LoginForm.css";
 import "../App.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useLogin } from "../LoginContext";
 
 const validateUsername = (username, isAdmin = false) => {
   if (!username) return "Username is required";
@@ -20,6 +21,7 @@ const validatePassword = (password) => {
 };
 
 export default function LoginForm() {
+  const { isAuthenticated } = useLogin();
   const [isActive, setIsActive] = useState(false);
   const [loginData, setLoginData] = useState({
     instituteId: "",
@@ -45,24 +47,29 @@ export default function LoginForm() {
       const userID = localStorage.getItem("userID");
       const instID = localStorage.getItem("instID");
       const type = localStorage.getItem("type");
-  
+
       if (!token || !userID || !instID || !type) {
         setLoading(false);
         return;
       }
-  
+
       try {
         const response = await axios.post(
           `${process.env.REACT_APP_BASE_URL}/auth/verify-token`,
           { token, userID, instID, type }
         );
-  
+
         if (response.status === 200) {
-          if (type === "admin") {
-            navigate("/faculty/dashboard");
-          } else {
-            navigate("/student/dashboard");
-          }
+            if (type === "admin") {
+              setLoading(false);
+              console.log("hi");
+              navigate("/faculty/dashboard");
+            } else {
+              console.log("hi");
+              setLoading(false);
+              navigate("/student/dashboard");
+            }
+          
         } else {
           localStorage.clear();
           navigate("/");
@@ -75,10 +82,9 @@ export default function LoginForm() {
         setLoading(false);
       }
     };
-  
+
     verifyToken();
-  }, [navigate]); 
-  
+  }, [isAuthenticated]);
 
   if (loading) {
     return <div>Loading...</div>;
@@ -131,10 +137,13 @@ export default function LoginForm() {
           const userRole = role === "admin" ? "faculty" : "student";
           localStorage.setItem("instID", data.instituteId);
           localStorage.setItem("userID", data.username);
-    
-          navigate(userRole === "faculty" ? "/faculty/dashboard" : "/student/dashboard");
+
+          setLoading(false);
+          navigate(
+            userRole === "faculty" ? "/faculty/dashboard" : "/student/dashboard"
+          );
         } else {
-          setError(response.data.message); 
+          setError(response.data.message);
         }
       } catch (error) {
         console.error("Login failed", error);

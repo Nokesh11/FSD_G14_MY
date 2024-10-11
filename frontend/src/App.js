@@ -54,11 +54,7 @@ function App() {
           {/* Student Routes */}
           <Route
             path="/student/*"
-            element={
-              <ProtectedRoute
-                element={<Layout />}
-                requiredRole="student"
-              />
+            element={<Layout />
             }
           >
             <Route path="dashboard" element={<StudentDashboard />} />
@@ -74,11 +70,7 @@ function App() {
           {/* Faculty Routes */}
           <Route
             path="/faculty/*"
-            element={
-              <ProtectedRoute
-                element={<Layout />}
-                requiredRole="admin"
-              />
+            element={<Layout />
             }
           >
             <Route path="dashboard" element={<FacultyDashboard />} />
@@ -89,6 +81,7 @@ function App() {
           </Route>
 
           {/* Other Routes */}
+          <Route path="/attendance" element={<ExcelEditor />} />
           <Route path="/unauthorized" element={<Unauthorized />} />
           <Route path="*" element={<Error404 />} />
         </Routes>

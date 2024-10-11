@@ -1,13 +1,15 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginContext = createContext(null);
 
 export const LoginProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -35,9 +37,11 @@ export const LoginProvider = ({ children }) => {
           }
         );
 
+        console.log("Im here" +  isAuthenticated);
         if (response.status === 200) {
           // Set authentication and user role
           setIsAuthenticated(true);
+          console.log(isAuthenticated)
           setUserRole(type);
         } else {
           setIsAuthenticated(false);
@@ -50,9 +54,16 @@ export const LoginProvider = ({ children }) => {
         setLoading(false); // End the loading phase
       }
     };
-
     checkAuth();
   }, [isAuthenticated]); 
+
+  useEffect(()=>{
+    const abc = ()=>{
+      if(!isAuthenticated) 
+        navigate("/");
+    }
+    abc();
+  }, [])
 
   return (
     <LoginContext.Provider

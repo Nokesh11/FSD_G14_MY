@@ -5,16 +5,15 @@ const ProtectedRoute = ({ element, requiredRole }) => {
   const { isAuthenticated, loading, error, userRole } = useLogin();
 
   if (loading) {
-    return <p>Loading...</p>; 
+    return <p>Loading...</p>; // Display loading screen while authentication is checked
   }
 
-  if (error || !isAuthenticated) {
-    return <Navigate to={"/"}/>
+  if (!isAuthenticated) {
+    return <Navigate to="/" />; // Redirect to login if not authenticated
   }
 
-  // Check if the required role matches
   if (requiredRole && requiredRole !== userRole) {
-    return <Navigate to={"/unauthorized"}/>
+    return <Navigate to="/unauthorized" />; // Redirect if user role doesn't match
   }
 
   return element; // Render the protected component if authenticated and role matches
